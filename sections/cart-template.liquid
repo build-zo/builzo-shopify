@@ -40,7 +40,7 @@
 
       <!-- Free delivery bar -->
       <!-- Delivery message — simple alert -->
-      <div class="qc-cart__delivery-msg">
+      <div class="qc-cart__delivery-msg" id="qcDeliveryMsgContainer">
         {%- if is_free -%}
           <span class="qc-cart__delivery-msg__icon">🎉</span>
           <div class="qc-cart__delivery-msg__body">
@@ -138,7 +138,7 @@
             <!-- Delivery fee — matches Shopify tiered rules -->
             <div class="qc-cart__summary-row">
               <span>Delivery</span>
-              <span>
+              <span id="qcDeliveryFeeDisplay">
                 {%- if is_free -%}
                   <span class="qc-cart__free-tag">FREE</span>
                 {%- else -%}
@@ -165,7 +165,7 @@
           <!-- Total including delivery -->
           <div class="qc-cart__summary-total">
             <span>Total</span>
-            <span>{{ ctotal | plus: delivery_fee | money }}</span>
+            <span id="qcCartTotal">{{ ctotal | plus: delivery_fee | money }}</span>
           </div>
 
           {%- if cart.total_discounts > 0 -%}
@@ -413,6 +413,196 @@
       if (p) p.click();
     });
   }
+
+})();
+</script>
+
+<script>
+/* ── Live delivery charges from Shopify shipping rules ──── */
+(function () {
+  'use strict';
+
+  var subtotalCents  = {{ cart.total_price }};
+  var subtotalRupees = subtotalCents / 100;
+
+  /* Tier fallback — mirrors section settings */
+  var tier1Max = {{ section.settings.tier1_max | default: 1000 }};
+  var tier2Max = {{ section.settings.tier2_max | default: 5000 }};
+  var fee1     = {{ section.settings.fee_tier1 | default: 250 }};
+  var fee2     = {{ section.settings.fee_tier2 | default: 150 }};
+
+  function fmtMoney(rupees) {
+    return '₹' + rupees.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function applyFee(feeRupees) {
+    var feeEl   = document.getElementById('qcDeliveryFeeDisplay');
+    var totalEl = document.getElementById('qcCartTotal');
+
+    if (feeEl) {
+      feeEl.innerHTML = feeRupees === 0
+        ? '<span class="qc-cart__free-tag">FREE</span>'
+        : '<span class="qc-cart__delivery-fee">' + fmtMoney(feeRupees) + '</span>';
+    }
+
+    if (totalEl) {
+      totalEl.textContent = fmtMoney(subtotalRupees + feeRupees);
+    }
+
+    updateMsg(feeRupees);
+  }
+
+  function updateMsg(feeRupees) {
+    var el = document.getElementById('qcDeliveryMsgContainer');
+    if (!el) return;
+
+    var html;
+    if (feeRupees === 0) {
+      html = '<span class="qc-cart__delivery-msg__icon">🎉</span>'
+           + '<div class="qc-cart__delivery-msg__body">'
+           + '<p class="qc-cart__delivery-msg__text">You\'ve unlocked <strong>free delivery</strong> on this order!</p>'
+           + '</div>';
+    } else {
+      var remaining = Math.ceil(tier2Max - subtotalRupees);
+      var nextFee   = subtotalRupees >= tier1Max ? 0 : fee2;
+      html = '<span class="qc-cart__delivery-msg__icon">🚚</span>'
+           + '<div class="qc-cart__delivery-msg__body">'
+           + '<p class="qc-cart__delivery-msg__text">Add <strong>₹' + remaining.toLocaleString('en-IN') + '</strong> more for <strong>free delivery</strong></p>'
+           + '<p class="qc-cart__delivery-msg__sub">Current delivery charge: ₹' + feeRupees
+           + (subtotalRupees < tier1Max ? ' → ₹' + fee2 + ' after ₹' + tier1Max.toLocaleString('en-IN') + ' → Free after ₹' + tier2Max.toLocaleString('en-IN') : '')
+           + '</p>'
+           + '</div>';
+    }
+    el.innerHTML = html;
+  }
+
+  function tierFallback() {
+    var fee = subtotalRupees >= tier2Max ? 0
+            : subtotalRupees >= tier1Max ? fee2
+            : fee1;
+    applyFee(fee);
+  }
+
+  /* Shopify computes shipping rates async — poll up to MAX_TRIES */
+  var MAX_TRIES = 5;
+  var POLL_MS   = 600;
+
+  /* Shopify requires ISO 3166-2 province codes for India */
+  var IN_NAME_MAP = {
+    'andhra pradesh':'AP','arunachal pradesh':'AR','assam':'AS','bihar':'BR',
+    'chhattisgarh':'CT','goa':'GA','gujarat':'GJ','haryana':'HR',
+    'himachal pradesh':'HP','jharkhand':'JH','karnataka':'KA','kerala':'KL',
+    'madhya pradesh':'MP','maharashtra':'MH','manipur':'MN','meghalaya':'ML',
+    'mizoram':'MZ','nagaland':'NL','odisha':'OR','punjab':'PB',
+    'rajasthan':'RJ','sikkim':'SK','tamil nadu':'TN','telangana':'TG',
+    'tripura':'TR','uttar pradesh':'UP','uttarakhand':'UT','west bengal':'WB',
+    'delhi':'DL','jammu and kashmir':'JK','ladakh':'LA','chandigarh':'CH',
+    'puducherry':'PY','andaman and nicobar islands':'AN','lakshadweep':'LD',
+    'dadra and nagar haveli':'DN','daman and diu':'DD'
+  };
+
+  /* Derive state from pincode's first two digits (India postal circles) */
+  function pinToStateCode(pin) {
+    var p = parseInt(String(pin).substring(0, 2), 10);
+    if (p === 11)              return 'DL';
+    if (p >= 12 && p <= 13)   return 'HR';
+    if (p >= 14 && p <= 16)   return 'PB';
+    if (p === 17)              return 'HP';
+    if (p >= 18 && p <= 19)   return 'JK';
+    if (p >= 20 && p <= 28)   return 'UP';
+    if (p >= 30 && p <= 34)   return 'RJ';
+    if (p >= 36 && p <= 39)   return 'GJ';
+    if (p >= 40 && p <= 44)   return 'MH';
+    if (p >= 45 && p <= 48)   return 'MP';
+    if (p === 49)              return 'CT';
+    if (p >= 50 && p <= 53)   return 'TG';
+    if (p >= 54 && p <= 55)   return 'AP';
+    if (p >= 56 && p <= 59)   return 'KA';
+    if (p >= 60 && p <= 66)   return 'TN';
+    if (p >= 67 && p <= 69)   return 'KL';
+    if (p >= 70 && p <= 74)   return 'WB';
+    if (p >= 75 && p <= 77)   return 'OR';
+    if (p >= 78 && p <= 79)   return 'AS';
+    if (p >= 80 && p <= 85)   return 'BR';
+    return 'DL';
+  }
+
+  function getProvinceCode(pincode, area) {
+    /* 1. Try state name from area string e.g. "Barnala, Punjab" */
+    if (area) {
+      var parts = area.split(',');
+      if (parts.length >= 2) {
+        var name = parts[parts.length - 1].trim().toLowerCase();
+        if (IN_NAME_MAP[name]) return IN_NAME_MAP[name];
+      }
+    }
+    /* 2. Fall back to pincode-based lookup */
+    return pinToStateCode(pincode);
+  }
+
+  function buildRatesUrl(pincode, area) {
+    var code = getProvinceCode(pincode, area);
+    return '/cart/shipping_rates.json'
+      + '?shipping_address[zip]='      + encodeURIComponent(pincode)
+      + '&shipping_address[country]=IN'
+      + '&shipping_address[province]=' + encodeURIComponent(code);
+  }
+
+  function fetchAndApply(pincode, area, attempt) {
+    if (!pincode) { tierFallback(); return; }
+    attempt = attempt || 1;
+
+    fetch(buildRatesUrl(pincode, area))
+      .then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        var rates = Array.isArray(data.shipping_rates) ? data.shipping_rates : [];
+
+        if (rates.length === 0) {
+          /* Empty = Shopify still computing — retry */
+          if (attempt < MAX_TRIES) {
+            setTimeout(function () { fetchAndApply(pincode, area, attempt + 1); }, POLL_MS * attempt);
+          } else {
+            tierFallback();
+          }
+          return;
+        }
+
+        /* Pick cheapest applicable rate */
+        var best = rates.reduce(function (a, b) {
+          return parseFloat(a.price) <= parseFloat(b.price) ? a : b;
+        });
+        applyFee(parseFloat(best.price) || 0);
+      })
+      .catch(function () {
+        if (attempt < MAX_TRIES) {
+          setTimeout(function () { fetchAndApply(pincode, area, attempt + 1); }, POLL_MS * attempt);
+        } else {
+          tierFallback();
+        }
+      });
+  }
+
+  /* Run on load with saved pincode */
+  try {
+    var saved = JSON.parse(localStorage.getItem('qc_pincode') || 'null');
+    if (saved && saved.pincode && saved.serviceable !== false) {
+      fetchAndApply(saved.pincode, saved.area || '');
+    } else {
+      tierFallback();
+    }
+  } catch (e) { tierFallback(); }
+
+  /* Update live when customer changes pincode */
+  document.addEventListener('qc:pincode:changed', function (e) {
+    if (e.detail && e.detail.serviceable !== false && e.detail.pincode) {
+      fetchAndApply(e.detail.pincode, e.detail.area || '');
+    } else {
+      tierFallback();
+    }
+  });
 
 })();
 </script>
