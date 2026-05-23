@@ -33,16 +33,6 @@
             "text": "Easy Returns"
           }
         },
-        "acc1": {
-          "type": "accordion",
-          "settings": {
-            "title": "Product Highlights",
-            "source": "metafield",
-            "content": "<p>Add your product highlights here.</p>",
-            "metafield_key": "custom.highlights",
-            "open_by_default": true
-          }
-        },
         "acc2": {
           "type": "accordion",
           "settings": {
@@ -50,6 +40,31 @@
             "source": "description",
             "content": "<p>Add your product highlights here.</p>",
             "metafield_key": "",
+            "open_by_default": true
+          }
+        },
+        "acc1": {
+          "type": "accordion",
+          "settings": {
+            "title": "Product Highlights",
+            "source": "metafield",
+            "content": "<p>Add your product highlights here.</p>",
+            "metafield_key": "custom.highlights",
+            "open_by_default": false
+          }
+        },
+        "specs1": {
+          "type": "specs_table",
+          "settings": {
+            "title": "Technical Specifications",
+            "metafield_key": "custom.specifications",
+            "col1_label": "Specification",
+            "col2_label": "Details",
+            "header_bg": "#f5a623",
+            "header_text": "#111111",
+            "row_alt_bg": "#fffdf0",
+            "key_bg": "#fefce8",
+            "border_color": "#e8d88a",
             "open_by_default": false
           }
         },
@@ -78,8 +93,9 @@
         "usp1",
         "usp2",
         "usp3",
-        "acc1",
         "acc2",
+        "acc1",
+        "specs1",
         "acc3",
         "acc4"
       ],
@@ -111,7 +127,7 @@
         "variant_radius": 8,
         "qty_label": "Quantity",
         "img_bg": "#f9f9f9",
-        "img_box_height": 440,
+        "img_box_height": 480,
         "img_box_width": 100,
         "img_radius": 16,
         "img_padding": 20,
@@ -129,16 +145,16 @@
         "delivery_prefix": "Delivery in",
         "default_delivery": "60-90 min",
         "show_whatsapp_btn": true,
-        "whatsapp_number": "918729022552",
+        "whatsapp_number": "",
         "wa_btn_text": "Buy on WhatsApp",
         "wa_message": "Hi! I want to order:",
         "show_bulk_price": true,
         "bulk_price_url": "",
-        "bulk_price_text": "",
+        "bulk_price_text": "Unlock Bulk Prices →",
         "show_tax_note": true,
         "tax_note_size": 12,
         "shipping_link_text": "Shipping",
-        "shipping_link_url": "shopify://pages/shipping-policy",
+        "shipping_link_url": "",
         "shipping_note": "calculated at checkout.",
         "usp_bg": "#f9f9f9",
         "usp_size": 12,

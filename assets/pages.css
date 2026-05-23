@@ -650,3 +650,114 @@
 .qc-cart__app-slot__inner {
   padding: 4px 0;
 }
+
+/* ── Product accordion rich text table styling ───────────── */
+.bzp-accordion-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: var(--bz-font-base, 13px);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e8d88a;
+}
+
+.bzp-accordion-body table thead tr,
+.bzp-accordion-body table tr:first-child th {
+  background: #F5A623;
+  color: #111111;
+  font-weight: 700;
+}
+
+.bzp-accordion-body table th,
+.bzp-accordion-body table td {
+  padding: 10px 14px;
+  text-align: left;
+  border: 1px solid #e8d88a;
+  font-size: 13px;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.bzp-accordion-body table tr:nth-child(even) td {
+  background: #fffdf0;
+}
+
+.bzp-accordion-body table tr:nth-child(odd) td {
+  background: #ffffff;
+}
+
+.bzp-accordion-body table td:first-child {
+  font-weight: 600;
+  color: #333;
+  width: 40%;
+  background: #fefce8;
+}
+
+/* Wrapper for spec tables — adds the highlighted box */
+.bzp-accordion-body table {
+  border-left: 3px solid #F5A623;
+}
+
+/* Headings inside accordion */
+.bzp-accordion-body h1,
+.bzp-accordion-body h2,
+.bzp-accordion-body h3,
+.bzp-accordion-body h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 10px;
+  padding: 10px 14px;
+  background: #fefce8;
+  border-radius: 6px;
+  border-left: 3px solid #F5A623;
+}
+
+/* ── Product specs table ─────────────────────────────────── */
+.bzp-specs-heading {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  background: #fefce8;
+  border-radius: 6px;
+  border-left: 3px solid #F5A623;
+}
+
+.bzp-specs-table-container {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e8d88a;
+  border-left: 3px solid #F5A623;
+}
+
+.bzp-specs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.bzp-specs-table thead tr th {
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.bzp-specs-table tbody tr td {
+  padding: 10px 14px;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.bzp-specs-td--key {
+  font-weight: 600;
+  width: 42%;
+  color: #333;
+}
+
+.bzp-specs-td--val {
+  color: #444;
+}

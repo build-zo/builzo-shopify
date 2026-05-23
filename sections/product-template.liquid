@@ -346,44 +346,63 @@
           </div>
         {%- endif -%}
 
-        <!-- ── ACCORDIONS ── -->
+        <!-- ── ALL BLOCKS in Theme Editor order ── -->
         <div class="bzp-accordions">
-
           {%- for block in section.blocks -%}
-            {%- if block.type == 'accordion' -%}
 
-              {%- comment -%} Resolve content — custom text OR product metafield {%- endcomment -%}
+            {%- comment -%}── SPECS TABLE ──{%- endcomment -%}
+            {%- if block.type == 'specs_table' -%}
+              {%- assign mf_key = block.settings.metafield_key | default: 'custom.specifications' -%}
+              {%- assign mf_parts = mf_key | split: '.' -%}
+              {%- if mf_parts.size == 2 -%}
+                {%- assign specs_mf = product.metafields[mf_parts[0]][mf_parts[1]] -%}
+                {%- if specs_mf != blank -%}
+                  <details class="bzp-accordion-item" {{ block.shopify_attributes }} {% if block.settings.open_by_default %}open{% endif %}>
+                    <summary class="bzp-accordion-q" style="display:flex;align-items:center;justify-content:space-between;padding:16px 4px;cursor:pointer;user-select:none;list-style:none;">
+                      {{ block.settings.title | default: 'Technical Specifications' }}
+                      <svg class="bzp-acc-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+                    </summary>
+                    <div class="bzp-accordion-body" style="padding:0 4px 16px;">
+                      <div
+                        class="bzp-specs-table-container"
+                        id="bzpSpecs-{{ block.id }}"
+                        data-specs="{{ specs_mf.value | json | escape }}"
+                        data-col1="{{ block.settings.col1_label | default: 'Specification' | escape }}"
+                        data-col2="{{ block.settings.col2_label | default: 'Details' | escape }}"
+                        data-header-bg="{{ block.settings.header_bg | default: '#F5A623' }}"
+                        data-header-text="{{ block.settings.header_text | default: '#111111' }}"
+                        data-key-bg="{{ block.settings.key_bg | default: '#fefce8' }}"
+                        data-border="{{ block.settings.border_color | default: '#e8d88a' }}"
+                        style="border-color:{{ block.settings.border_color | default: '#e8d88a' }};"
+                      ></div>
+                    </div>
+                  </details>
+                {%- endif -%}
+              {%- endif -%}
+
+            {%- comment -%}── ACCORDION ──{%- endcomment -%}
+            {%- elsif block.type == 'accordion' -%}
               {%- assign acc_title = block.settings.title -%}
               {%- assign acc_source = block.settings.source | default: 'custom' -%}
               {%- assign acc_has_content = false -%}
-              {%- assign mf_val = nil -%}
               {%- assign mf_obj = nil -%}
-
-              {%- comment -%} Smart fallback for description blocks -%}
-              {%- endcomment -%}
               {%- assign title_lower = acc_title | downcase -%}
               {%- if acc_source == 'custom' and block.settings.content == blank -%}
                 {%- if title_lower contains 'description' or title_lower contains 'about' or title_lower contains 'detail' -%}
                   {%- assign acc_source = 'description' -%}
                 {%- endif -%}
               {%- endif -%}
-
               {%- if acc_source == 'description' and product.description != blank -%}
                 {%- assign acc_has_content = true -%}
-
               {%- elsif acc_source == 'custom' and block.settings.content != blank -%}
                 {%- assign acc_has_content = true -%}
-
               {%- elsif acc_source == 'metafield' and block.settings.metafield_key != blank -%}
                 {%- assign mf_parts = block.settings.metafield_key | split: '.' -%}
                 {%- if mf_parts.size == 2 -%}
                   {%- assign mf_obj = product.metafields[mf_parts[0]][mf_parts[1]] -%}
-                  {%- if mf_obj != blank -%}
-                    {%- assign acc_has_content = true -%}
-                  {%- endif -%}
+                  {%- if mf_obj != blank -%}{%- assign acc_has_content = true -%}{%- endif -%}
                 {%- endif -%}
               {%- endif -%}
-
               {%- if acc_has_content -%}
                 <details class="bzp-accordion-item" {{ block.shopify_attributes }} {% if block.settings.open_by_default %}open{% endif %}>
                   <summary class="bzp-accordion-q" style="display:flex;align-items:center;justify-content:space-between;padding:16px 4px;cursor:pointer;user-select:none;list-style:none;">
@@ -391,31 +410,42 @@
                     <svg class="bzp-acc-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
                   </summary>
                   <div class="bzp-accordion-body rte" style="padding:0 4px 16px;line-height:1.7;">
-
                     {%- if acc_source == 'description' -%}
                       {{ product.description }}
-
                     {%- elsif acc_source == 'custom' -%}
                       {{ block.settings.content }}
-
                     {%- elsif acc_source == 'metafield' and mf_obj != blank -%}
                       {%- assign mf_parts2 = block.settings.metafield_key | split: '.' -%}
                       {{ product.metafields[mf_parts2[0]][mf_parts2[1]] | metafield_tag }}
                     {%- endif -%}
-
                   </div>
                 </details>
               {%- endif -%}
 
+            {%- comment -%}── USP ──{%- endcomment -%}
+            {%- elsif block.type == 'usp' -%}
+              {%- comment -%} USPs are rendered above, skip here {%- endcomment -%}
+
+            {%- elsif block.type == '@app' -%}
+              {% render block %}
+
             {%- endif -%}
           {%- endfor -%}
-
         </div>
 
-        <!-- App blocks -->
-        {%- for block in section.blocks -%}
-          {%- if block.type == '@app' -%}{% render block %}{%- endif -%}
-        {%- endfor -%}
+        <script>
+        document.querySelectorAll('[id^="bzpSpecs-"]').forEach(function(el) {
+          try {
+            var rows = JSON.parse(el.dataset.specs);
+            if (!Array.isArray(rows)) return;
+            var col1=el.dataset.col1, col2=el.dataset.col2, hBg=el.dataset.headerBg, hTxt=el.dataset.headerText, kBg=el.dataset.keyBg, bdr=el.dataset.border;
+            var html = '<table class="bzp-specs-table"><thead><tr style="background:'+hBg+';color:'+hTxt+'"><th>'+col1+'</th><th>'+col2+'</th></tr></thead><tbody>';
+            rows.forEach(function(r){ html+='<tr><td class="bzp-specs-td--key" style="background:'+kBg+';border-color:'+bdr+'">'+(r.spec||'')+'</td><td class="bzp-specs-td--val" style="border-color:'+bdr+'">'+(r.value||'')+'</td></tr>'; });
+            el.innerHTML = html + '</tbody></table>';
+          } catch(e){}
+        });
+        </script>
+
 
       </div>
     </div>
@@ -955,6 +985,73 @@
       "settings": [
         { "type": "text", "id": "icon", "label": "Emoji icon", "default": "✅" },
         { "type": "text", "id": "text", "label": "USP text",   "default": "100% Genuine Product" }
+      ]
+    },
+    {
+      "type": "specs_table",
+      "name": "Specs Table",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Accordion title",
+          "default": "Technical Specifications"
+        },
+        {
+          "type": "text",
+          "id": "metafield_key",
+          "label": "Metafield key",
+          "default": "custom.specifications",
+          "info": "Format: namespace.key — must be JSON type with 'heading' and 'rows' array"
+        },
+        {
+          "type": "text",
+          "id": "col1_label",
+          "label": "Column 1 header",
+          "default": "Specification"
+        },
+        {
+          "type": "text",
+          "id": "col2_label",
+          "label": "Column 2 header",
+          "default": "Details"
+        },
+        {
+          "type": "color",
+          "id": "header_bg",
+          "label": "Table header background",
+          "default": "#F5A623"
+        },
+        {
+          "type": "color",
+          "id": "header_text",
+          "label": "Table header text color",
+          "default": "#111111"
+        },
+        {
+          "type": "color",
+          "id": "row_alt_bg",
+          "label": "Alternate row background",
+          "default": "#fffdf0"
+        },
+        {
+          "type": "color",
+          "id": "key_bg",
+          "label": "Spec name cell background",
+          "default": "#fefce8"
+        },
+        {
+          "type": "color",
+          "id": "border_color",
+          "label": "Table border color",
+          "default": "#e8d88a"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_by_default",
+          "label": "Open by default",
+          "default": false
+        }
       ]
     },
     {
