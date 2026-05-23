@@ -1,0 +1,1008 @@
+{% comment %}
+  FILE: sections/product-template.liquid
+  Full product page — variant switching, accordions, bulk price, fully customizable
+{% endcomment %}
+
+{%- assign product          = product -%}
+{%- assign current_variant  = product.selected_or_first_available_variant -%}
+{%- assign accent           = section.settings.accent_color          | default: '#F5A623' -%}
+{%- assign btn_bg           = section.settings.btn_bg                | default: accent -%}
+{%- assign btn_text         = section.settings.btn_text_color        | default: '#111111' -%}
+{%- assign title_size       = section.settings.title_size            | default: 28 -%}
+{%- assign title_color      = section.settings.title_color           | default: '#111111' -%}
+{%- assign price_size       = section.settings.price_size            | default: 26 -%}
+{%- assign price_color      = section.settings.price_color           | default: '#111111' -%}
+{%- assign compare_color    = section.settings.compare_price_color   | default: '#999999' -%}
+{%- assign label_size       = section.settings.label_size            | default: 13 -%}
+{%- assign label_color      = section.settings.label_color           | default: '#555555' -%}
+{%- assign body_bg          = section.settings.body_bg               | default: '#ffffff' -%}
+{%- assign img_bg           = section.settings.img_bg                | default: '#f9f9f9' -%}
+{%- assign badge_bg         = section.settings.badge_bg              | default: '#F5A623' -%}
+{%- assign badge_text       = section.settings.badge_text_color      | default: '#111111' -%}
+{%- assign stock_color      = section.settings.in_stock_color        | default: '#22c55e' -%}
+{%- assign oos_color        = section.settings.oos_color             | default: '#ef4444' -%}
+{%- assign variant_border   = section.settings.variant_border        | default: '#e2e2e2' -%}
+{%- assign variant_selected_bg = section.settings.variant_selected_bg | default: accent -%}
+{%- assign variant_selected_text = section.settings.variant_selected_text | default: '#111111' -%}
+{%- assign accordion_border = section.settings.accordion_border      | default: '#e8e8e8' -%}
+{%- assign accordion_title_size = section.settings.accordion_title_size | default: 15 -%}
+{%- assign accordion_title_color = section.settings.accordion_title_color | default: '#111111' -%}
+{%- assign accordion_body_size = section.settings.accordion_body_size | default: 14 -%}
+{%- assign accordion_body_color = section.settings.accordion_body_color | default: '#444444' -%}
+{%- assign show_wa_btn      = section.settings.show_whatsapp_btn -%}
+{%- assign wa_number = section.settings.whatsapp_number | remove: '+' | remove: ' ' | remove: '-' | strip -%}
+{%- assign show_bulk        = section.settings.show_bulk_price -%}
+{%- assign bulk_url         = section.settings.bulk_price_url -%}
+{%- assign bulk_text        = section.settings.bulk_price_text -%}
+
+<style>
+  #bzPdp-{{ section.id }} { background: {{ body_bg }}; }
+  #bzPdp-{{ section.id }} .bzp-title { font-size: {{ title_size }}px; color: {{ title_color }}; }
+  #bzPdp-{{ section.id }} .bzp-price { font-size: {{ price_size }}px; color: {{ price_color }}; }
+  #bzPdp-{{ section.id }} .bzp-compare { color: {{ compare_color }}; }
+  #bzPdp-{{ section.id }} .bzp-label { font-size: {{ label_size }}px; color: {{ label_color }}; }
+  #bzPdp-{{ section.id }} .bzp-badge { background: {{ badge_bg }}; color: {{ badge_text }}; }
+  #bzPdp-{{ section.id }} .bzp-stock--in { color: {{ stock_color }}; }
+  #bzPdp-{{ section.id }} .bzp-stock--out { color: {{ oos_color }}; }
+  #bzPdp-{{ section.id }} .bzp-variant-btn {
+    border-color: {{ variant_border }};
+    font-size: {{ label_size }}px;
+    border-radius: {{ section.settings.variant_radius | default: 8 }}px;
+  }
+  #bzPdp-{{ section.id }} .bzp-variant-btn.selected {
+    background: {{ variant_selected_bg }};
+    color: {{ variant_selected_text }};
+    border-color: {{ variant_selected_bg }};
+  }
+  #bzPdp-{{ section.id }} .bzp-atc {
+    background: {{ btn_bg }};
+    color: {{ btn_text }};
+    font-size: {{ section.settings.btn_size | default: 16 }}px;
+    border-radius: {{ section.settings.btn_radius | default: 10 }}px;
+    height: {{ section.settings.btn_height | default: 52 }}px;
+  }
+  #bzPdp-{{ section.id }} .bzp-wa-btn { border-radius: {{ section.settings.btn_radius | default: 10 }}px; height: {{ section.settings.btn_height | default: 52 }}px; }
+  #bzPdp-{{ section.id }} .bzp-accordion-item { border-bottom: 1px solid {{ accordion_border }}; }
+  #bzPdp-{{ section.id }} .bzp-accordion-q {
+    font-size: {{ accordion_title_size }}px;
+    color: {{ accordion_title_color }};
+    font-weight: {{ section.settings.accordion_title_weight | default: '600' }};
+  }
+  #bzPdp-{{ section.id }} .bzp-accordion-body {
+    font-size: {{ accordion_body_size }}px;
+    color: {{ accordion_body_color }};
+  }
+  #bzPdp-{{ section.id }} .bzp-delivery-pill { background: {{ accent }}1a; color: {{ accent }}; }
+  #bzPdp-{{ section.id }} .bzp-thumb.active,
+  #bzPdp-{{ section.id }} .bzp-thumb:hover { border-color: {{ accent }}; }
+  #bzPdp-{{ section.id }} .bzp-qty-btn:hover { background: {{ accent }}1a; }
+  #bzPdp-{{ section.id }} .bzp-bulk-link { color: {{ accent }}; }
+</style>
+
+<section id="bzPdp-{{ section.id }}" data-section-id="{{ section.id }}" style="padding: {{ section.settings.pad_v | default: 24 }}px 0;">
+  <div style="max-width: var(--qc-max-width, 1280px); margin: 0 auto; padding: 0 {{ section.settings.pad_h | default: 24 }}px;">
+
+    <!-- Breadcrumb -->
+    {%- if section.settings.show_breadcrumb -%}
+    <nav style="font-size:{{ section.settings.breadcrumb_size | default: 12 }}px; color: {{ label_color }}; margin-bottom:16px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+      <a href="{{ routes.root_url }}" style="color:{{ label_color }}; text-decoration:none;">Home</a>
+      {%- if product.collections.first -%}
+        <span>›</span>
+        <a href="{{ product.collections.first.url }}" style="color:{{ label_color }}; text-decoration:none;">{{ product.collections.first.title }}</a>
+      {%- endif -%}
+      <span>›</span>
+      <span style="color:{{ title_color }};">{{ product.title }}</span>
+    </nav>
+    {%- endif -%}
+
+    <!-- 2-col layout -->
+    <div class="bzp-layout">
+
+      <!-- ── LEFT: Gallery ── -->
+      <div class="bzp-gallery">
+
+        <!-- Main image box -->
+        <div
+          class="bzp-main-img-wrap"
+          id="bzpImgWrap"
+          style="
+            background: {{ img_bg }};
+            border-radius: {{ section.settings.img_radius | default: 16 }}px;
+            width: {{ section.settings.img_box_width | default: 100 }}%;
+            height: {{ section.settings.img_box_height | default: 480 }}px;
+            max-width: 100%;
+          "
+        >
+          {%- if current_variant.compare_at_price > current_variant.price -%}
+            {%- assign disc = current_variant.compare_at_price | minus: current_variant.price | times: 100 | divided_by: current_variant.compare_at_price -%}
+            <span class="bzp-badge" id="bzpDiscBadge">{{ disc }}% OFF</span>
+          {%- endif -%}
+
+          {%- if product.featured_image -%}
+            <img
+              id="bzpMainImg"
+              src="{{ product.featured_image | image_url: width: 800 }}"
+              alt="{{ product.featured_image.alt | escape }}"
+              width="800" height="800"
+              loading="eager"
+              style="width:100%;height:100%;object-fit:{{ section.settings.img_fit | default: 'contain' }};padding:{{ section.settings.img_padding | default: 20 }}px;transition:opacity 0.2s ease;"
+            />
+          {%- endif -%}
+
+          <!-- Arrows — only show if more than 1 image -->
+          {%- if product.images.size > 1 -%}
+            <button
+              type="button"
+              class="bzp-arrow bzp-arrow--prev"
+              id="bzpPrev"
+              aria-label="Previous image"
+              style="
+                border-radius: {{ section.settings.arrow_radius | default: 50 }}px;
+                background: {{ section.settings.arrow_bg | default: 'rgba(255,255,255,0.92)' }};
+                color: {{ section.settings.arrow_color | default: '#111111' }};
+                width: {{ section.settings.arrow_size | default: 40 }}px;
+                height: {{ section.settings.arrow_size | default: 40 }}px;
+                box-shadow: {{ section.settings.arrow_shadow | default: '0 2px 8px rgba(0,0,0,0.15)' }};
+              "
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button
+              type="button"
+              class="bzp-arrow bzp-arrow--next"
+              id="bzpNext"
+              aria-label="Next image"
+              style="
+                border-radius: {{ section.settings.arrow_radius | default: 50 }}px;
+                background: {{ section.settings.arrow_bg | default: 'rgba(255,255,255,0.92)' }};
+                color: {{ section.settings.arrow_color | default: '#111111' }};
+                width: {{ section.settings.arrow_size | default: 40 }}px;
+                height: {{ section.settings.arrow_size | default: 40 }}px;
+                box-shadow: {{ section.settings.arrow_shadow | default: '0 2px 8px rgba(0,0,0,0.15)' }};
+              "
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
+            <!-- Dot indicators -->
+            {%- if section.settings.show_dots -%}
+              <div class="bzp-dots" id="bzpDots">
+                {%- for img in product.images -%}
+                  <span class="bzp-dot{% if forloop.first %} active{% endif %}" data-index="{{ forloop.index0 }}" style="background:{% if forloop.first %}{{ accent }}{% else %}rgba(0,0,0,0.2){% endif %};"></span>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+
+        </div>
+
+        <!-- Thumbnails -->
+        {%- if product.images.size > 1 and section.settings.show_thumbs -%}
+          <div class="bzp-thumbs" id="bzpThumbs">
+            {%- for img in product.images -%}
+              <button
+                class="bzp-thumb{% if forloop.first %} active{% endif %}"
+                data-src="{{ img | image_url: width: 800 }}"
+                data-alt="{{ img.alt | escape }}"
+                data-index="{{ forloop.index0 }}"
+                type="button"
+                style="
+                  border-radius: {{ section.settings.thumb_radius | default: 8 }}px;
+                  width: {{ section.settings.thumb_size | default: 72 }}px;
+                  height: {{ section.settings.thumb_size | default: 72 }}px;
+                "
+              >
+                <img
+                  src="{{ img | image_url: width: 160 }}"
+                  alt="{{ img.alt | escape }}"
+                  width="{{ section.settings.thumb_size | default: 72 }}"
+                  height="{{ section.settings.thumb_size | default: 72 }}"
+                  loading="lazy"
+                  style="width:100%;height:100%;object-fit:contain;padding:4px;"
+                />
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+      </div>
+
+      <!-- ── RIGHT: Info ── -->
+      <div class="bzp-info">
+
+        <!-- Vendor -->
+        {%- if product.vendor != blank and section.settings.show_vendor -%}
+          <p style="font-size:{{ section.settings.vendor_size | default: 12 }}px; font-weight:600; color:{{ label_color }}; text-transform:uppercase; letter-spacing:0.06em; margin:0 0 8px;">{{ product.vendor }}</p>
+        {%- endif -%}
+
+        <!-- Title -->
+        <h1 class="bzp-title" style="font-weight:{{ section.settings.title_weight | default: '700' }}; line-height:1.2; margin:0 0 12px; letter-spacing:-0.01em;">{{ product.title }}</h1>
+
+        <!-- Stock status -->
+        {%- if current_variant.available -%}
+          <p class="bzp-stock--in" style="display:flex;align-items:center;gap:6px;font-size:{{ label_size }}px;font-weight:600;margin:0 0 12px;">
+            <span style="width:8px;height:8px;border-radius:50%;background:{{ stock_color }};display:inline-block;"></span>
+            {{ section.settings.in_stock_text | default: 'IN STOCK' }}
+          </p>
+        {%- else -%}
+          <p class="bzp-stock--out" style="display:flex;align-items:center;gap:6px;font-size:{{ label_size }}px;font-weight:600;margin:0 0 12px;">
+            <span style="width:8px;height:8px;border-radius:50%;background:{{ oos_color }};display:inline-block;"></span>
+            {{ section.settings.oos_text | default: 'OUT OF STOCK' }}
+          </p>
+        {%- endif -%}
+
+        <!-- Price -->
+        <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px;">
+          {%- if current_variant.compare_at_price > current_variant.price -%}
+            <s class="bzp-compare" style="font-size:calc({{ price_size }}px - 6px);" id="bzpCompare">{{ current_variant.compare_at_price | money }}</s>
+          {%- endif -%}
+          <span class="bzp-price" style="font-weight:800;" id="bzpPrice">{{ current_variant.price | money }}</span>
+          {%- if current_variant.compare_at_price > current_variant.price -%}
+            <span class="bzp-badge" style="font-size:{{ label_size }}px;padding:3px 10px;border-radius:5px;">Sale</span>
+          {%- endif -%}
+        </div>
+
+        <!-- Tax note -->
+        {%- if section.settings.show_tax_note -%}
+          <p style="font-size:{{ section.settings.tax_note_size | default: 12 }}px; color:{{ label_color }}; margin:0 0 10px;">
+            {%- if cart.taxes_included -%}Incl GST{%- else -%}Excl GST{%- endif -%}
+            &nbsp;
+            {%- assign shipping_url = section.settings.shipping_link_url | default: routes.shipping_policy_url -%}
+            <a href="{{ shipping_url }}" style="color:{{ label_color }}; text-decoration:underline;">{{ section.settings.shipping_link_text | default: 'Shipping' }}</a>
+            {{ section.settings.shipping_note | default: 'calculated at checkout.' }}
+          </p>
+        {%- endif -%}
+
+        <!-- Bulk price link -->
+        {%- if show_bulk and bulk_url != blank -%}
+          <a href="{{ bulk_url }}" class="bzp-bulk-link" style="display:inline-block;font-size:{{ label_size }}px;font-weight:600;text-decoration:underline;margin-bottom:14px;">
+            {{ bulk_text | default: 'Unlock Bulk Prices' }}
+          </a>
+        {%- endif -%}
+
+        <!-- Delivery time -->
+        {%- if section.settings.show_delivery -%}
+          <div class="bzp-delivery-pill" data-qc-delivery-promise style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:{{ label_size }}px;font-weight:600;margin-bottom:18px;">
+            ⚡ {{ section.settings.delivery_prefix | default: 'Delivery in' }}
+            <strong data-qc-delivery-time>{{ section.settings.default_delivery | default: '60-90 min' }}</strong>
+          </div>
+        {%- endif -%}
+
+        <!-- ── VARIANTS ── -->
+        {%- unless product.has_only_default_variant -%}
+          <div class="bzp-variants" style="margin-bottom:20px;">
+            {%- for option in product.options_with_values -%}
+              <div style="margin-bottom:14px;">
+                <p class="bzp-label" style="margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">
+                  {{ option.name }}: <span id="bzpOptionVal-{{ option.position }}" style="font-weight:400;text-transform:none;">{{ option.selected_value }}</span>
+                </p>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  {%- for value in option.values -%}
+                    <button
+                      type="button"
+                      class="bzp-variant-btn{% if value == option.selected_value %} selected{% endif %}"
+                      data-option-pos="{{ option.position }}"
+                      data-value="{{ value | escape }}"
+                    >{{ value }}</button>
+                  {%- endfor -%}
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endunless -%}
+
+        <!-- ── QUANTITY + ATC ── -->
+        <p class="bzp-label" style="margin:0 0 8px;font-weight:600;">{{ section.settings.qty_label | default: 'Quantity' }}</p>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+          <!-- Qty -->
+          <div style="display:flex;align-items:center;border:1.5px solid {{ variant_border }};border-radius:{{ section.settings.btn_radius | default: 10 }}px;overflow:hidden;">
+            <button type="button" id="bzpQtyMinus" class="bzp-qty-btn" style="width:44px;height:{{ section.settings.btn_height | default: 52 }}px;background:none;border:none;font-size:22px;cursor:pointer;font-family:inherit;transition:background 0.1s;">−</button>
+            <span id="bzpQtyVal" style="width:44px;text-align:center;font-size:16px;font-weight:600;color:{{ title_color }};">1</span>
+            <button type="button" id="bzpQtyPlus" class="bzp-qty-btn" style="width:44px;height:{{ section.settings.btn_height | default: 52 }}px;background:none;border:none;font-size:22px;cursor:pointer;font-family:inherit;transition:background 0.1s;">+</button>
+          </div>
+
+          <!-- Add to cart -->
+          <button
+            type="button"
+            id="bzpAtcBtn"
+            class="bzp-atc"
+            data-variant-id="{{ current_variant.id }}"
+            style="flex:1;min-width:160px;border:none;cursor:pointer;font-family:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity 0.15s;"
+            {% unless current_variant.available %}disabled{% endunless %}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span id="bzpAtcLabel">{% if current_variant.available %}{{ section.settings.atc_text | default: 'Add to cart' }}{% else %}{{ section.settings.oos_btn_text | default: 'Out of stock' }}{% endif %}</span>
+          </button>
+        </div>
+
+        <!-- WhatsApp buy -->
+        {%- assign wa_number_clean = section.settings.whatsapp_number | remove: '+' | remove: ' ' | remove: '-' | strip -%}
+        {%- if show_wa_btn and wa_number_clean != blank and wa_number_clean != '919876543210' -%}
+          <a
+            href="https://wa.me/{{ wa_number_clean }}?text={{ section.settings.wa_message | default: 'Hi! I want to order: ' | url_encode }}{{ product.title | url_encode }}"
+            target="_blank"
+            rel="noopener"
+            class="bzp-wa-btn"
+            style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#25D366;color:#fff;font-size:{{ section.settings.btn_size | default: 16 }}px;font-weight:700;border-radius:{{ section.settings.btn_radius | default: 10 }}px;height:{{ section.settings.btn_height | default: 52 }}px;text-decoration:none;margin-bottom:20px;transition:opacity 0.15s;"
+            onmouseenter="this.style.opacity='0.88'" onmouseleave="this.style.opacity='1'"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            {{ section.settings.wa_btn_text | default: 'Buy on WhatsApp' }}
+          </a>
+        {%- endif -%}
+
+        <!-- USPs -->
+        {%- assign usp_blocks = section.blocks | where: 'type', 'usp' -%}
+        {%- if usp_blocks.size > 0 -%}
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px;padding:14px;background:{{ section.settings.usp_bg | default: '#f9f9f9' }};border-radius:{{ section.settings.usp_radius | default: 10 }}px;">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'usp' -%}
+                <div style="display:flex;align-items:center;gap:8px;font-size:{{ section.settings.usp_size | default: 12 }}px;color:{{ section.settings.usp_color | default: '#444444' }};" {{ block.shopify_attributes }}>
+                  <span style="font-size:18px;flex-shrink:0;">{{ block.settings.icon }}</span>
+                  <span>{{ block.settings.text }}</span>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        <!-- ── ACCORDIONS ── -->
+        <div class="bzp-accordions">
+
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'accordion' -%}
+
+              {%- comment -%} Resolve content — custom text OR product metafield {%- endcomment -%}
+              {%- assign acc_title = block.settings.title -%}
+              {%- assign acc_source = block.settings.source | default: 'custom' -%}
+              {%- assign acc_has_content = false -%}
+              {%- assign mf_val = nil -%}
+              {%- assign mf_obj = nil -%}
+
+              {%- comment -%} Smart fallback for description blocks -%}
+              {%- endcomment -%}
+              {%- assign title_lower = acc_title | downcase -%}
+              {%- if acc_source == 'custom' and block.settings.content == blank -%}
+                {%- if title_lower contains 'description' or title_lower contains 'about' or title_lower contains 'detail' -%}
+                  {%- assign acc_source = 'description' -%}
+                {%- endif -%}
+              {%- endif -%}
+
+              {%- if acc_source == 'description' and product.description != blank -%}
+                {%- assign acc_has_content = true -%}
+
+              {%- elsif acc_source == 'custom' and block.settings.content != blank -%}
+                {%- assign acc_has_content = true -%}
+
+              {%- elsif acc_source == 'metafield' and block.settings.metafield_key != blank -%}
+                {%- assign mf_parts = block.settings.metafield_key | split: '.' -%}
+                {%- if mf_parts.size == 2 -%}
+                  {%- assign mf_obj = product.metafields[mf_parts[0]][mf_parts[1]] -%}
+                  {%- if mf_obj != blank -%}
+                    {%- assign acc_has_content = true -%}
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endif -%}
+
+              {%- if acc_has_content -%}
+                <details class="bzp-accordion-item" {{ block.shopify_attributes }} {% if block.settings.open_by_default %}open{% endif %}>
+                  <summary class="bzp-accordion-q" style="display:flex;align-items:center;justify-content:space-between;padding:16px 4px;cursor:pointer;user-select:none;list-style:none;">
+                    {{ acc_title }}
+                    <svg class="bzp-acc-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+                  </summary>
+                  <div class="bzp-accordion-body rte" style="padding:0 4px 16px;line-height:1.7;">
+
+                    {%- if acc_source == 'description' -%}
+                      {{ product.description }}
+
+                    {%- elsif acc_source == 'custom' -%}
+                      {{ block.settings.content }}
+
+                    {%- elsif acc_source == 'metafield' and mf_obj != blank -%}
+                      {%- assign mf_parts2 = block.settings.metafield_key | split: '.' -%}
+                      {{ product.metafields[mf_parts2[0]][mf_parts2[1]] | metafield_tag }}
+                    {%- endif -%}
+
+                  </div>
+                </details>
+              {%- endif -%}
+
+            {%- endif -%}
+          {%- endfor -%}
+
+        </div>
+
+        <!-- App blocks -->
+        {%- for block in section.blocks -%}
+          {%- if block.type == '@app' -%}{% render block %}{%- endif -%}
+        {%- endfor -%}
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Variant JSON for JS -->
+<script type="application/json" id="bzpVariantData-{{ product.id }}">
+  {{ product.variants | json }}
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  var productId   = {{ product.id }};
+  var variants    = JSON.parse(document.getElementById('bzpVariantData-' + productId).textContent);
+  var atcBtn      = document.getElementById('bzpAtcBtn');
+  var atcLabel    = document.getElementById('bzpAtcLabel');
+  var priceEl     = document.getElementById('bzpPrice');
+  var compareEl   = document.getElementById('bzpCompare');
+  var mainImg     = document.getElementById('bzpMainImg');
+  var qtyVal      = document.getElementById('bzpQtyVal');
+  var qtyMinus    = document.getElementById('bzpQtyMinus');
+  var qtyPlus     = document.getElementById('bzpQtyPlus');
+  var qty         = 1;
+
+  var atcText  = {{ section.settings.atc_text     | default: 'Add to cart'   | json }};
+  var oosText  = {{ section.settings.oos_btn_text | default: 'Out of stock'  | json }};
+
+  /* ── Current selected options ─────────────────────────── */
+  var selectedOptions = {};
+  document.querySelectorAll('.bzp-variant-btn').forEach(function (btn) {
+    if (btn.classList.contains('selected')) {
+      selectedOptions[btn.dataset.optionPos] = btn.dataset.value;
+    }
+  });
+
+  /* ── Find variant matching selected options ───────────── */
+  function findVariant() {
+    return variants.find(function (v) {
+      return Object.keys(selectedOptions).every(function (pos) {
+        return v['option' + pos] === selectedOptions[pos];
+      });
+    });
+  }
+
+  /* ── Format money ──────────────────────────────────────── */
+  function money(cents) {
+    if (window.Shopify && Shopify.formatMoney) {
+      return Shopify.formatMoney(cents, '{{ shop.money_format }}');
+    }
+    return '{{ shop.currency }} ' + (cents / 100).toFixed(2);
+  }
+
+  /* ── Update page after variant change ─────────────────── */
+  function updateVariant(variant) {
+    if (!variant) return;
+
+    /* Price */
+    if (priceEl) priceEl.textContent = money(variant.price);
+    if (compareEl) {
+      if (variant.compare_at_price && variant.compare_at_price > variant.price) {
+        compareEl.textContent = money(variant.compare_at_price);
+        compareEl.style.display = '';
+      } else {
+        compareEl.style.display = 'none';
+      }
+    }
+
+    /* ATC button */
+    if (atcBtn) {
+      atcBtn.dataset.variantId = variant.id;
+      if (variant.available) {
+        atcBtn.disabled = false;
+        atcBtn.style.opacity = '1';
+        if (atcLabel) atcLabel.textContent = atcText;
+      } else {
+        atcBtn.disabled = true;
+        atcBtn.style.opacity = '0.6';
+        if (atcLabel) atcLabel.textContent = oosText;
+      }
+    }
+
+    /* Image — switch to variant image if it has one */
+    if (variant.featured_image) {
+      var varImgSrc = variant.featured_image.src;
+      /* Find index in images array */
+      for (var vi = 0; vi < images.length; vi++) {
+        if (images[vi].src.indexOf(variant.featured_image.id) !== -1 ||
+            images[vi].src === varImgSrc) {
+          goTo(vi);
+          break;
+        }
+      }
+    }
+
+    /* Update URL without reload */
+    var url = new URL(window.location.href);
+    url.searchParams.set('variant', variant.id);
+    window.history.replaceState({}, '', url.toString());
+  }
+
+  /* ── Variant button clicks ─────────────────────────────── */
+  document.querySelectorAll('.bzp-variant-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var pos   = this.dataset.optionPos;
+      var value = this.dataset.value;
+
+      /* Deselect others in same option group */
+      document.querySelectorAll('.bzp-variant-btn[data-option-pos="' + pos + '"]').forEach(function (b) {
+        b.classList.remove('selected');
+      });
+      this.classList.add('selected');
+      selectedOptions[pos] = value;
+
+      /* Update label */
+      var labelEl = document.getElementById('bzpOptionVal-' + pos);
+      if (labelEl) labelEl.textContent = value;
+
+      /* Find + apply matching variant */
+      var matched = findVariant();
+      if (matched) updateVariant(matched);
+    });
+  });
+
+  /* ── Quantity ──────────────────────────────────────────── */
+  if (qtyMinus) qtyMinus.addEventListener('click', function () {
+    if (qty > 1) { qty--; if (qtyVal) qtyVal.textContent = qty; }
+  });
+  if (qtyPlus) qtyPlus.addEventListener('click', function () {
+    qty++;
+    if (qtyVal) qtyVal.textContent = qty;
+  });
+
+  /* ── Add to Cart ───────────────────────────────────────── */
+  if (atcBtn) {
+    atcBtn.addEventListener('click', function () {
+      if (this.disabled) return;
+      var variantId = parseInt(this.dataset.variantId, 10);
+      this.disabled = true;
+      this.style.opacity = '0.7';
+      if (atcLabel) atcLabel.textContent = '…';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ id: variantId, quantity: qty })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function () {
+        if (atcLabel) atcLabel.textContent = '✓ Added!';
+        atcBtn.style.opacity = '1';
+        document.dispatchEvent(new CustomEvent('cart:update'));
+        setTimeout(function () {
+          atcBtn.disabled = false;
+          if (atcLabel) atcLabel.textContent = atcText;
+        }, 1500);
+      })
+      .catch(function () {
+        atcBtn.disabled = false;
+        atcBtn.style.opacity = '1';
+        if (atcLabel) atcLabel.textContent = atcText;
+      });
+    });
+  }
+
+  /* ── Gallery — arrows, dots, thumbnails ──────────────── */
+  var images      = [
+    {%- for img in product.images -%}
+      { src: "{{ img | image_url: width: 800 }}", alt: "{{ img.alt | escape }}" }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ];
+  var currentIdx  = 0;
+  var mainImg     = document.getElementById('bzpMainImg');
+  var prevBtn     = document.getElementById('bzpPrev');
+  var nextBtn     = document.getElementById('bzpNext');
+  var dotsWrap    = document.getElementById('bzpDots');
+  var thumbsWrap  = document.getElementById('bzpThumbs');
+
+  function goTo(idx) {
+    if (images.length === 0) return;
+    idx = (idx + images.length) % images.length;
+    currentIdx = idx;
+
+    /* Fade transition */
+    if (mainImg) {
+      mainImg.style.opacity = '0';
+      setTimeout(function () {
+        mainImg.src = images[idx].src;
+        mainImg.alt = images[idx].alt || '';
+        mainImg.style.opacity = '1';
+      }, 150);
+    }
+
+    /* Sync dots */
+    if (dotsWrap) {
+      dotsWrap.querySelectorAll('.bzp-dot').forEach(function (d, i) {
+        d.classList.toggle('active', i === idx);
+        d.style.background = i === idx ? '{{ accent }}' : 'rgba(0,0,0,0.2)';
+      });
+    }
+
+    /* Sync thumbnails */
+    if (thumbsWrap) {
+      thumbsWrap.querySelectorAll('.bzp-thumb').forEach(function (t, i) {
+        t.classList.toggle('active', i === idx);
+      });
+      /* Scroll active thumb into view */
+      var activeThumb = thumbsWrap.querySelector('.bzp-thumb.active');
+      if (activeThumb) activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', function () { goTo(currentIdx - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { goTo(currentIdx + 1); });
+
+  /* Dot clicks */
+  if (dotsWrap) {
+    dotsWrap.querySelectorAll('.bzp-dot').forEach(function (dot) {
+      dot.addEventListener('click', function () { goTo(parseInt(this.dataset.index, 10)); });
+    });
+  }
+
+  /* Thumbnail clicks */
+  if (thumbsWrap) {
+    thumbsWrap.querySelectorAll('.bzp-thumb').forEach(function (thumb) {
+      thumb.addEventListener('click', function () { goTo(parseInt(this.dataset.index, 10)); });
+    });
+  }
+
+  /* Swipe support on mobile */
+  var touchStartX = 0;
+  var imgWrap = document.getElementById('bzpImgWrap');
+  if (imgWrap) {
+    imgWrap.addEventListener('touchstart', function (e) { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+    imgWrap.addEventListener('touchend', function (e) {
+      var diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) goTo(diff > 0 ? currentIdx + 1 : currentIdx - 1);
+    }, { passive: true });
+  }
+
+  /* Keyboard arrow navigation */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft')  goTo(currentIdx - 1);
+    if (e.key === 'ArrowRight') goTo(currentIdx + 1);
+  });
+
+  /* Update gallery when variant changes (if variant has image) */
+
+  /* ── Accordion chevron rotate ─────────────────────────── */
+  document.querySelectorAll('.bzp-accordion-item').forEach(function (details) {
+    details.addEventListener('toggle', function () {
+      var icon = this.querySelector('.bzp-acc-icon');
+      if (icon) icon.style.transform = this.open ? 'rotate(180deg)' : '';
+    });
+  });
+
+  /* ── Delivery time — sync from pincode context ─────────── */
+  function updateProductDelivery() {
+    if (typeof QCUpdateDeliveryOnPage === 'function') {
+      QCUpdateDeliveryOnPage();
+    } else {
+      /* Fallback: read directly from localStorage */
+      try {
+        var saved = localStorage.getItem('qc_pincode');
+        if (saved) {
+          var d = JSON.parse(saved);
+          if (d && d.time && d.serviceable !== false) {
+            var el = document.querySelector('[data-qc-delivery-time]');
+            if (el) el.textContent = d.time;
+          }
+        }
+      } catch(e) {}
+    }
+  }
+
+  /* Run on load */
+  updateProductDelivery();
+
+  /* Re-run when pincode changes */
+  document.addEventListener('qc:pincode:changed', function(e) {
+    if (e.detail && e.detail.time) {
+      var el = document.querySelector('[data-qc-delivery-time]');
+      if (el) el.textContent = e.detail.serviceable !== false ? e.detail.time : 'Not serviceable';
+    }
+  });
+
+  /* Also try after a short delay in case header.js hasn't loaded yet */
+  setTimeout(updateProductDelivery, 500);
+
+})();
+</script>
+
+<style>
+.bzp-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: {{ section.settings.layout_gap | default: 48 }}px;
+  align-items: flex-start;
+}
+.bzp-gallery { position: sticky; top: 90px; }
+.bzp-main-img-wrap {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bzp-badge {
+  position: absolute;
+  top: 12px; left: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  z-index: 1;
+}
+/* ── Arrows ─────────────────────────────────────────────── */
+.bzp-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: transform 0.15s, box-shadow 0.15s;
+  padding: 0;
+}
+.bzp-arrow:hover { transform: translateY(-50%) scale(1.1); }
+.bzp-arrow--prev { left: 12px; }
+.bzp-arrow--next { right: 12px; }
+
+/* ── Dots ──────────────────────────────────────────────── */
+.bzp-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+.bzp-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  border: none;
+  padding: 0;
+  display: block;
+  flex-shrink: 0;
+}
+.bzp-dot.active { transform: scale(1.4); }
+
+/* ── Thumbs ─────────────────────────────────────────────── */
+.bzp-thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.bzp-thumbs::-webkit-scrollbar { display: none; }
+.bzp-thumb {
+  border: 2px solid #e8e8e8;
+  background: #fafafa;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.15s;
+  flex-shrink: 0;
+}
+.bzp-variant-btn {
+  padding: 7px 16px;
+  border: 1.5px solid;
+  background: #fff;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.15s;
+  font-family: inherit;
+  font-weight: 500;
+}
+.bzp-qty-btn:hover { background: rgba(0,0,0,0.05); }
+.bzp-atc:hover { opacity: 0.88; }
+.bzp-accordion-item:first-child { border-top: 1px solid; border-top-color: inherit; }
+.bzp-accordion-q::-webkit-details-marker { display: none; }
+.bzp-accordion-q::marker { display: none; }
+/* Rich text styles for product description */
+.bzp-accordion-body.rte p   { margin: 0 0 10px; }
+.bzp-accordion-body.rte ul,
+.bzp-accordion-body.rte ol  { padding-left: 20px; margin: 0 0 10px; }
+.bzp-accordion-body.rte li  { margin-bottom: 5px; }
+.bzp-accordion-body.rte a   { color: inherit; text-decoration: underline; }
+.bzp-accordion-body.rte strong { font-weight: 700; }
+.bzp-accordion-body.rte h1,
+.bzp-accordion-body.rte h2,
+.bzp-accordion-body.rte h3 { font-weight: 700; margin: 0 0 8px; }
+@media (max-width: 768px) {
+  .bzp-layout { grid-template-columns: 1fr; gap: 24px; }
+  .bzp-gallery { position: static; }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Product",
+  "tag": "section",
+  "settings": [
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "accent_color",          "label": "Accent color",              "default": "#F5A623" },
+    { "type": "color", "id": "body_bg",               "label": "Page background",           "default": "#ffffff" },
+    { "type": "color", "id": "badge_bg",              "label": "Sale badge background",     "default": "#F5A623" },
+    { "type": "color", "id": "badge_text_color",      "label": "Sale badge text",           "default": "#111111" },
+    { "type": "color", "id": "in_stock_color",        "label": "In stock indicator",        "default": "#22c55e" },
+    { "type": "color", "id": "oos_color",             "label": "Out of stock indicator",    "default": "#ef4444" },
+    { "type": "header", "content": "Title" },
+    { "type": "range",  "id": "title_size",    "label": "Title font size",   "min": 16, "max": 48, "step": 1, "default": 28, "unit": "px" },
+    { "type": "color",  "id": "title_color",   "label": "Title color",       "default": "#111111" },
+    { "type": "select", "id": "title_weight",  "label": "Title font weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" },
+        { "value": "800", "label": "Extra Bold" }
+      ], "default": "700"
+    },
+    { "type": "header", "content": "Price" },
+    { "type": "range", "id": "price_size",         "label": "Price font size",        "min": 16, "max": 48, "step": 1, "default": 26, "unit": "px" },
+    { "type": "color", "id": "price_color",        "label": "Price color",            "default": "#111111" },
+    { "type": "color", "id": "compare_price_color","label": "Compare price color",    "default": "#999999" },
+    { "type": "header", "content": "Labels & Text" },
+    { "type": "range", "id": "label_size",  "label": "Label font size", "min": 10, "max": 18, "step": 1, "default": 13, "unit": "px" },
+    { "type": "color", "id": "label_color", "label": "Label color",     "default": "#555555" },
+    { "type": "header", "content": "Buttons" },
+    { "type": "color", "id": "btn_bg",         "label": "Add to cart background", "default": "#F5A623" },
+    { "type": "color", "id": "btn_text_color", "label": "Add to cart text color", "default": "#111111" },
+    { "type": "range", "id": "btn_size",       "label": "Button font size",       "min": 12, "max": 22, "step": 1, "default": 16, "unit": "px" },
+    { "type": "range", "id": "btn_height",     "label": "Button height",          "min": 40, "max": 72, "step": 2, "default": 52, "unit": "px" },
+    { "type": "range", "id": "btn_radius",     "label": "Button corner radius",   "min": 0,  "max": 32, "step": 2, "default": 10, "unit": "px" },
+    { "type": "text",  "id": "atc_text",       "label": "Add to cart text",       "default": "Add to cart" },
+    { "type": "text",  "id": "oos_btn_text",   "label": "Out of stock text",      "default": "Out of stock" },
+    { "type": "header", "content": "Variants" },
+    { "type": "color", "id": "variant_border",        "label": "Variant border color",   "default": "#e2e2e2" },
+    { "type": "color", "id": "variant_selected_bg",   "label": "Selected variant bg",    "default": "#F5A623" },
+    { "type": "color", "id": "variant_selected_text", "label": "Selected variant text",  "default": "#111111" },
+    { "type": "range", "id": "variant_radius",        "label": "Variant corner radius",  "min": 0, "max": 24, "step": 2, "default": 8, "unit": "px" },
+    { "type": "text",  "id": "qty_label",             "label": "Quantity label",          "default": "Quantity" },
+    { "type": "header", "content": "Image Box" },
+    { "type": "color", "id": "img_bg",        "label": "Image background",      "default": "#f9f9f9" },
+    { "type": "range", "id": "img_box_height","label": "Image box height",       "min": 300, "max": 700, "step": 20, "default": 480, "unit": "px" },
+    { "type": "range", "id": "img_box_width", "label": "Image box width %",      "min": 50,  "max": 100, "step": 5,  "default": 100, "unit": "%" },
+    { "type": "range", "id": "img_radius",    "label": "Image corner radius",    "min": 0,   "max": 32,  "step": 2,  "default": 16,  "unit": "px" },
+    { "type": "range", "id": "img_padding",   "label": "Image inner padding",    "min": 0,   "max": 60,  "step": 4,  "default": 20,  "unit": "px" },
+    {
+      "type": "select",
+      "id": "img_fit",
+      "label": "Image fit",
+      "options": [
+        { "value": "contain", "label": "Contain (show full image)" },
+        { "value": "cover",   "label": "Cover (fill box)" }
+      ],
+      "default": "contain"
+    },
+    { "type": "header", "content": "Navigation Arrows" },
+    { "type": "color", "id": "arrow_bg",      "label": "Arrow background",       "default": "#ffffff" },
+    { "type": "color", "id": "arrow_color",   "label": "Arrow icon color",       "default": "#111111" },
+    { "type": "range", "id": "arrow_size",    "label": "Arrow button size",      "min": 28, "max": 60, "step": 2, "default": 40, "unit": "px" },
+    { "type": "range", "id": "arrow_radius",  "label": "Arrow corner radius",    "min": 0,  "max": 50, "step": 2, "default": 50, "unit": "px", "info": "50 = circle" },
+    { "type": "text",  "id": "arrow_shadow",  "label": "Arrow shadow (CSS)",     "default": "0 2px 8px rgba(0,0,0,0.15)" },
+    { "type": "header", "content": "Thumbnails" },
+    { "type": "checkbox", "id": "show_thumbs",  "label": "Show thumbnails",      "default": true },
+    { "type": "range",    "id": "thumb_size",   "label": "Thumbnail size",       "min": 48, "max": 120, "step": 4,  "default": 72, "unit": "px" },
+    { "type": "range",    "id": "thumb_radius", "label": "Thumbnail radius",     "min": 0,  "max": 20,  "step": 2,  "default": 8,  "unit": "px" },
+    { "type": "checkbox", "id": "show_dots",    "label": "Show dot indicators",  "default": true },
+    { "type": "header", "content": "Delivery" },
+    { "type": "checkbox", "id": "show_delivery",     "label": "Show delivery time",    "default": true },
+    { "type": "text",     "id": "delivery_prefix",   "label": "Delivery prefix text",  "default": "Delivery in" },
+    { "type": "text",     "id": "default_delivery",  "label": "Default delivery time", "default": "60-90 min" },
+    { "type": "header", "content": "WhatsApp" },
+    { "type": "checkbox", "id": "show_whatsapp_btn", "label": "Show WhatsApp button",     "default": true },
+    { "type": "text",     "id": "whatsapp_number",   "label": "WhatsApp number",          "info": "Enter with country code, no + or spaces. Example: 919876543210 for +91 98765 43210" },
+    { "type": "text",     "id": "wa_btn_text",        "label": "WhatsApp button text",     "default": "Buy on WhatsApp" },
+    { "type": "text",     "id": "wa_message",         "label": "Pre-filled message",       "default": "Hi! I want to order: " },
+    { "type": "header", "content": "Bulk Pricing" },
+    { "type": "checkbox", "id": "show_bulk_price",   "label": "Show bulk price link",   "default": true },
+    { "type": "url",      "id": "bulk_price_url",    "label": "Bulk price page URL" },
+    { "type": "text",     "id": "bulk_price_text",   "label": "Bulk price link text",   "default": "Unlock Bulk Prices →" },
+    { "type": "header", "content": "Tax & Shipping" },
+    { "type": "checkbox", "id": "show_tax_note",       "label": "Show tax/shipping note",  "default": true },
+    { "type": "range",    "id": "tax_note_size",       "label": "Tax note font size",      "min": 10, "max": 14, "step": 1, "default": 12, "unit": "px" },
+    { "type": "text",     "id": "shipping_link_text",  "label": "Shipping link text",      "default": "Shipping" },
+    { "type": "url",      "id": "shipping_link_url",   "label": "Shipping link URL",       "info": "Leave blank to use your store's default shipping policy page" },
+    { "type": "text",     "id": "shipping_note",       "label": "Shipping note",           "default": "calculated at checkout." },
+    { "type": "header", "content": "USP Strip" },
+    { "type": "color", "id": "usp_bg",     "label": "USP strip background", "default": "#f9f9f9" },
+    { "type": "range", "id": "usp_size",   "label": "USP font size",        "min": 10, "max": 16, "step": 1, "default": 12, "unit": "px" },
+    { "type": "color", "id": "usp_color",  "label": "USP text color",       "default": "#444444" },
+    { "type": "range", "id": "usp_radius", "label": "USP strip radius",     "min": 0,  "max": 20, "step": 2, "default": 10, "unit": "px" },
+    { "type": "header", "content": "Accordions" },
+    { "type": "color",  "id": "accordion_border",       "label": "Accordion border color",   "default": "#e8e8e8" },
+    { "type": "range",  "id": "accordion_title_size",   "label": "Accordion title size",     "min": 12, "max": 22, "step": 1, "default": 15, "unit": "px" },
+    { "type": "color",  "id": "accordion_title_color",  "label": "Accordion title color",    "default": "#111111" },
+    { "type": "select", "id": "accordion_title_weight", "label": "Accordion title weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ], "default": "600"
+    },
+    { "type": "range", "id": "accordion_body_size",  "label": "Accordion body size",  "min": 11, "max": 18, "step": 1, "default": 14, "unit": "px" },
+    { "type": "color", "id": "accordion_body_color", "label": "Accordion body color", "default": "#444444" },
+    { "type": "header", "content": "Misc" },
+    { "type": "checkbox", "id": "show_breadcrumb",   "label": "Show breadcrumb",     "default": true },
+    { "type": "range",    "id": "breadcrumb_size",   "label": "Breadcrumb size",     "min": 10, "max": 16, "step": 1, "default": 12, "unit": "px" },
+    { "type": "checkbox", "id": "show_vendor",       "label": "Show vendor/brand",   "default": true },
+    { "type": "range",    "id": "vendor_size",       "label": "Vendor font size",    "min": 10, "max": 16, "step": 1, "default": 12, "unit": "px" },
+    { "type": "text",     "id": "in_stock_text",     "label": "In stock label",      "default": "IN STOCK" },
+    { "type": "text",     "id": "oos_text",          "label": "Out of stock label",  "default": "OUT OF STOCK" },
+    { "type": "range",    "id": "layout_gap",        "label": "Gap between columns", "min": 16, "max": 80, "step": 4, "default": 48, "unit": "px" },
+    { "type": "range",    "id": "pad_v",             "label": "Vertical padding",    "min": 0,  "max": 60, "step": 4, "default": 24, "unit": "px" },
+    { "type": "range",    "id": "pad_h",             "label": "Horizontal padding",  "min": 8,  "max": 48, "step": 4, "default": 24, "unit": "px" }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP Item",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Emoji icon", "default": "✅" },
+        { "type": "text", "id": "text", "label": "USP text",   "default": "100% Genuine Product" }
+      ]
+    },
+    {
+      "type": "accordion",
+      "name": "Accordion Section",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Section title", "default": "Product Highlights" },
+        {
+          "type": "select",
+          "id": "source",
+          "label": "Content source",
+          "options": [
+            { "value": "custom",      "label": "Custom text (below)" },
+            { "value": "description", "label": "Product description" },
+            { "value": "metafield",   "label": "Product metafield" }
+          ],
+          "default": "custom",
+          "info": "Choose where content comes from. 'Product description' uses the main description from Shopify. 'Metafield' reads from a product metafield you specify."
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Custom content",
+          "default": "<p>Add your product highlights here.</p>",
+          "info": "Used when source is set to 'Custom text'"
+        },
+        {
+          "type": "text",
+          "id": "metafield_key",
+          "label": "Metafield key",
+          "info": "Format: namespace.key — e.g. 'custom.highlights' or 'product.faq'. Create metafields at Products → [product] → Metafields in Shopify Admin."
+        },
+        { "type": "checkbox", "id": "open_by_default", "label": "Open by default", "default": false }
+      ]
+    },
+    { "type": "@app" }
+  ],
+  "presets": [{
+    "name": "Product",
+    "blocks": [
+      { "type": "usp", "settings": { "icon": "✅", "text": "100% Genuine Product" } },
+      { "type": "usp", "settings": { "icon": "🚚", "text": "60-90 Min Delivery" } },
+      { "type": "usp", "settings": { "icon": "↩️", "text": "Easy Returns" } },
+      { "type": "accordion", "settings": { "title": "Product Highlights", "source": "metafield", "metafield_key": "custom.highlights", "open_by_default": true } },
+      { "type": "accordion", "settings": { "title": "Product Description", "source": "description" } },
+      { "type": "accordion", "settings": { "title": "FAQs", "source": "metafield", "metafield_key": "custom.faqs" } },
+      { "type": "accordion", "settings": { "title": "Returns & Exchange Policy", "source": "custom", "content": "<p>Easy 7-day returns. Contact us on WhatsApp for hassle-free returns.</p>" } }
+    ]
+  }]
+}
+{% endschema %}

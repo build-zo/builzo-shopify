@@ -1,0 +1,151 @@
+{% comment %}
+  FILE: sections/promo-banner.liquid
+  Full-width promotional banner — mobile/desktop images, size controls
+{% endcomment %}
+
+{%- assign ph = section.settings.banner_height | default: 90 -%}
+{%- assign hs = section.settings.heading_size  | default: 20 -%}
+
+<style>
+  #promo-{{ section.id }} .qc-promo__card { min-height: {{ ph }}px; }
+  #promo-{{ section.id }} .qc-promo__heading { font-size: {{ hs }}px; }
+</style>
+
+<section class="qc-promo" id="promo-{{ section.id }}" data-section-id="{{ section.id }}">
+  <a
+    href="{{ section.settings.url | default: '#' }}"
+    class="qc-promo__card"
+    style="background: {{ section.settings.bg_color }};"
+    {% if section.settings.url == blank %}aria-hidden="true" tabindex="-1"{% endif %}
+  >
+    {%- if section.settings.image != blank -%}
+      <picture>
+        {%- if section.settings.image_mobile != blank -%}
+          <source media="(max-width: 768px)" srcset="{{ section.settings.image_mobile | image_url: width: 800 }}" />
+        {%- endif -%}
+        <img
+          src="{{ section.settings.image | image_url: width: 1400 }}"
+          alt="{{ section.settings.heading | escape }}"
+          class="qc-promo__img"
+          width="1400"
+          height="{{ ph }}"
+          loading="lazy"
+        />
+      </picture>
+    {%- else -%}
+      <div class="qc-promo__content">
+        <div class="qc-promo__text">
+          {%- if section.settings.badge != blank -%}
+            <span class="qc-promo__badge" style="background: {{ section.settings.badge_color }};">
+              {{ section.settings.badge }}
+            </span>
+          {%- endif -%}
+          <h3 class="qc-promo__heading">{{ section.settings.heading }}</h3>
+          {%- if section.settings.subheading != blank -%}
+            <p class="qc-promo__sub">{{ section.settings.subheading }}</p>
+          {%- endif -%}
+        </div>
+        {%- if section.settings.cta_label != blank -%}
+          <span class="qc-promo__cta" style="background: {{ section.settings.cta_color }}; color: #fff;">
+            {{ section.settings.cta_label }} →
+          </span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </a>
+</section>
+
+{% schema %}
+{
+  "name": "Promo Banner",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Banner image — desktop",
+      "info": "1400×200px recommended. If set, overrides text layout."
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Banner image — mobile",
+      "info": "Optional. Shown on screens 768px and below."
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#fef9c3"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge",
+      "default": "LIMITED TIME"
+    },
+    {
+      "type": "color",
+      "id": "badge_color",
+      "label": "Badge color",
+      "default": "#dc2626"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "50% off on all dairy products today"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading font size",
+      "min": 14, "max": 40, "step": 1, "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Use code DAIRY50 at checkout"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "color",
+      "id": "cta_color",
+      "label": "Button color",
+      "default": "#0f6e56"
+    },
+    {
+      "type": "range",
+      "id": "banner_height",
+      "label": "Banner height",
+      "min": 60, "max": 300, "step": 10, "default": 90,
+      "unit": "px"
+    },
+    {
+      "type": "url",
+      "id": "url",
+      "label": "Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Promo Banner"
+    }
+  ]
+}
+{% endschema %}

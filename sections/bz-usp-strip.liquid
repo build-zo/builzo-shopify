@@ -1,0 +1,65 @@
+{% comment %}FILE: sections/bz-usp-strip.liquid{% endcomment %}
+
+<section class="bz-section bz-usp-strip" data-section-id="{{ section.id }}" style="background:{{ section.settings.bg_color | default: '#FFFFFF' }}; border-top: 1px solid var(--bz-border);">
+  <div class="bz-inner">
+    <div class="bz-usp-strip__grid">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'usp' -%}
+          <div class="bz-usp-strip__item" {{ block.shopify_attributes }}>
+            <span class="bz-usp-strip__icon">{{ block.settings.icon }}</span>
+            <div class="bz-usp-strip__text">
+              <p class="bz-usp-strip__title">{{ block.settings.title }}</p>
+              {%- if block.settings.desc != blank -%}
+                <p class="bz-usp-strip__desc">{{ block.settings.desc }}</p>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .bz-usp-strip__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 24px 0;
+  }
+  .bz-usp-strip__item { display: flex; align-items: flex-start; gap: 12px; }
+  .bz-usp-strip__icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+  .bz-usp-strip__title { font-size: var(--bz-font-base); font-weight: 700; color: var(--bz-black); margin: 0 0 3px; }
+  .bz-usp-strip__desc { font-size: var(--bz-font-xs); color: var(--bz-gray); margin: 0; line-height: 1.5; }
+</style>
+
+{% schema %}
+{
+  "name": "USP Strip",
+  "tag": "section",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FFFFFF" }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP Item",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Emoji icon", "default": "🚚" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Super Fast Delivery" },
+        { "type": "text", "id": "desc", "label": "Description", "default": "10-60 min delivery across Bathinda" }
+      ]
+    },
+    { "type": "@app" }
+  ],
+  "presets": [{
+    "name": "USP Strip",
+    "blocks": [
+      { "type": "usp", "settings": { "icon": "🚚", "title": "Super Fast Delivery", "desc": "10-60 min delivery across Bathinda" } },
+      { "type": "usp", "settings": { "icon": "↩️", "title": "Easy Returns", "desc": "Hassle-free returns" } },
+      { "type": "usp", "settings": { "icon": "🔒", "title": "Secure Payments", "desc": "100% safe & secure" } },
+      { "type": "usp", "settings": { "icon": "💬", "title": "24/7 Support", "desc": "We are here to help" } }
+    ]
+  }]
+}
+{% endschema %}

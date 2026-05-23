@@ -1,0 +1,225 @@
+{% comment %}
+  FILE: sections/product-row.liquid
+  Blinkit-style horizontally scrollable product row with Add to Cart
+{% endcomment %}
+
+{%- liquid
+  assign collection = collections[section.settings.collection]
+  assign product_limit = section.settings.product_limit | default: 10
+  assign accent = section.settings.accent_color | default: '#0f6e56'
+  assign cw = section.settings.card_width_override | default: 0
+  assign ch = section.settings.card_image_height_override | default: 0
+  assign view_all_label = section.settings.view_all_label | default: 'See all'
+  assign show_view_all = section.settings.show_view_all
+  assign bg = section.settings.bg_color | default: 'white'
+-%}
+
+{%- assign section_bg = 'var(--qc-bg-card)' -%}
+{%- if bg == 'light' -%}{%- assign section_bg = 'var(--qc-bg-page)' -%}{%- endif -%}
+{%- if bg == 'accent' -%}{%- assign section_bg = accent | append: '10' -%}{%- endif -%}
+
+{%- if collection != blank and collection.products_count > 0 -%}
+
+{%- if cw > 0 or ch > 0 -%}
+<style>
+  #prow-{{ section.id }} .qc-product-card {
+    {%- if cw > 0 -%}width: {{ cw }}px;{%- endif -%}
+  }
+  #prow-{{ section.id }} .qc-product-card__img-wrap {
+    {%- if ch > 0 -%}height: {{ ch }}px;{%- endif -%}
+  }
+</style>
+{%- endif -%}
+
+<section class="qc-product-row" id="prow-{{ section.id }}" data-section-id="{{ section.id }}" style="background: {{ section_bg }};">
+  <div class="qc-product-row__inner">
+
+    <div class="qc-section-header">
+      <div class="qc-section-header__left">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="qc-section-eyebrow" style="color: {{ accent }}; background: {{ accent }}1a;">
+            {{ section.settings.eyebrow }}
+          </span>
+        {%- endif -%}
+        <h2 class="qc-section-title">{{ section.settings.title | default: collection.title }}</h2>
+      </div>
+      {%- if show_view_all != false -%}
+      <a href="{{ collection.url }}" class="qc-view-all" style="color: {{ accent }};">
+        {{ view_all_label }}
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      {%- endif -%}
+    </div>
+
+    <div class="qc-product-row__scroll-wrap">
+      <ul class="qc-product-row__track" role="list">
+        {%- for product in collection.products limit: product_limit -%}
+          <li class="qc-product-card" data-product-id="{{ product.id }}">
+            <a href="{{ product.url }}" class="qc-product-card__img-wrap" tabindex="-1" aria-hidden="true">
+              {%- if product.featured_image != blank -%}
+                <img
+                  src="{{ product.featured_image | image_url: width: 300 }}"
+                  alt="{{ product.featured_image.alt | escape }}"
+                  width="150"
+                  height="150"
+                  loading="lazy"
+                  class="qc-product-card__img"
+                />
+              {%- else -%}
+                <div class="qc-product-card__img-placeholder">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+              {%- endif -%}
+              {%- if product.compare_at_price > product.price -%}
+                {%- assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+                <span class="qc-product-card__discount-badge">{{ discount }}% OFF</span>
+              {%- endif -%}
+            </a>
+
+            <div class="qc-product-card__body">
+              <a href="{{ product.url }}" class="qc-product-card__title-link">
+                <p class="qc-product-card__title">{{ product.title }}</p>
+              </a>
+              {%- if product.metafields.custom.unit_size != blank -%}
+                <p class="qc-product-card__meta">{{ product.metafields.custom.unit_size }}</p>
+              {%- elsif product.variants.first.title != 'Default Title' -%}
+                <p class="qc-product-card__meta">{{ product.variants.first.title }}</p>
+              {%- endif -%}
+
+              <div class="qc-product-card__footer">
+                <div class="qc-product-card__price-wrap">
+                  <span class="qc-product-card__price">{{ product.price | money }}</span>
+                  {%- if product.compare_at_price > product.price -%}
+                    <s class="qc-product-card__compare-price">{{ product.compare_at_price | money }}</s>
+                  {%- endif -%}
+                </div>
+                {%- if product.available -%}
+                  <button
+                    class="qc-add-btn"
+                    style="border-color: {{ accent }}; color: {{ accent }};"
+                    data-variant-id="{{ product.variants.first.id }}"
+                    data-product-title="{{ product.title | escape }}"
+                    aria-label="Add {{ product.title }} to cart"
+                    type="button"
+                  >
+                    <span class="qc-add-btn__idle">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      ADD
+                    </span>
+                    <span class="qc-add-btn__loading" hidden aria-hidden="true">···</span>
+                  </button>
+                {%- else -%}
+                  <span class="qc-product-card__oos">Out of stock</span>
+                {%- endif -%}
+              </div>
+            </div>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product Row",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Go to Products → Collections to create collections. Products added there appear here automatically."
+    },
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section heading",
+      "info": "Leave blank to use the collection name"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Label above heading",
+      "info": "e.g. '🏆 Best Sellers'"
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "View all link text",
+      "default": "See all"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show view all link",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "label": "Number of products to show",
+      "min": 4, "max": 20, "step": 2, "default": 10
+    },
+    {
+      "type": "select",
+      "id": "bg_color",
+      "label": "Section background",
+      "options": [
+        { "value": "white",  "label": "White" },
+        { "value": "light",  "label": "Light grey" },
+        { "value": "accent", "label": "Accent tint" }
+      ],
+      "default": "white"
+    },
+    {
+      "type": "header",
+      "content": "Card Size Overrides",
+      "info": "Set to 0 to use global Theme Settings values"
+    },
+    {
+      "type": "range",
+      "id": "card_width_override",
+      "label": "Card width (0 = global)",
+      "min": 0, "max": 240, "step": 10, "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_image_height_override",
+      "label": "Image height (0 = global)",
+      "min": 0, "max": 250, "step": 10, "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Row accent color",
+      "default": "#0f6e56"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Row",
+      "settings": {
+        "product_limit": 10,
+        "accent_color": "#0f6e56"
+      }
+    }
+  ]
+}
+{% endschema %}

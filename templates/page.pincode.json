@@ -1,0 +1,25 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "bz-pincode-page",
+      "settings": {
+        "title": "Check Delivery Availability",
+        "description": "We deliver only in Bathinda. Enter your pincode to check.",
+        "btn_label": "Check Delivery",
+        "show_areas_list": true,
+        "areas_title": "We currently deliver to:",
+        "bg_color": "#F5F5F5"
+      }
+    }
+  },
+  "order": ["main"]
+}

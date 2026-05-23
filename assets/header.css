@@ -1,0 +1,553 @@
+/*
+  ============================================================
+  QUICK COMMERCE HEADER — STYLESHEET
+  File:  assets/header.css
+  ============================================================
+  INSTALL: Go to Assets folder in theme code editor,
+  create a new file named "header.css" and paste this content.
+  ============================================================
+*/
+
+/* ── Reset & Base ─────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Wrapper ──────────────────────────────────────────────── */
+.qc-header-wrapper {
+  background: #ffffff;
+  border-bottom: 1px solid #e8e8e8;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  width: 100%;
+}
+
+/* ── Announcement / Top Bar ───────────────────────────────── */
+.qc-top-bar {
+  width: 100%;
+  padding: 7px 16px;
+  text-align: center;
+}
+
+.qc-top-bar__text {
+  margin: 0;
+  font-size: 12px;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.qc-top-bar__text svg {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+/* ── Main Header ──────────────────────────────────────────── */
+.qc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 64px;
+  gap: 16px;
+  max-width: var(--qc-max-width, 1280px);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ── Logo ─────────────────────────────────────────────────── */
+.qc-header__logo {
+  flex-shrink: 0;
+}
+
+.qc-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.qc-logo__img {
+  display: block;
+  height: auto;
+  max-height: 44px;
+  width: auto;
+  object-fit: contain;
+}
+
+.qc-logo__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.qc-logo__name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* ── Pincode Trigger ──────────────────────────────────────── */
+.qc-pincode-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 7px 12px;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  background: #f8f8f6;
+  min-width: 190px;
+  max-width: 220px;
+  transition: border-color 0.15s ease;
+  flex-shrink: 0;
+  text-align: left;
+  font-family: inherit;
+}
+
+.qc-pincode-trigger:hover {
+  border-color: currentColor;
+  border-color: var(--accent, #0f6e56);
+}
+
+.qc-pincode-trigger__icon {
+  flex-shrink: 0;
+}
+
+.qc-pincode-trigger__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.qc-pincode-trigger__label {
+  font-size: 10px;
+  color: #888;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.qc-pincode-trigger__value {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qc-delivery-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+
+/* ── Search Bar ───────────────────────────────────────────── */
+.qc-search {
+  flex: 1;
+  max-width: 380px;
+  min-width: 0;
+}
+
+.qc-search__form {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.qc-search__input {
+  width: 100%;
+  height: 40px;
+  padding: 0 44px 0 14px;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #f8f8f6;
+  color: #1a1a1a;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  font-family: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.qc-search__input:focus {
+  background: #ffffff;
+  border-color: #0f6e56;
+  box-shadow: 0 0 0 3px rgba(15, 110, 86, 0.08);
+}
+
+.qc-search__input::placeholder {
+  color: #aaa;
+}
+
+/* Remove default browser search clear button */
+.qc-search__input::-webkit-search-decoration,
+.qc-search__input::-webkit-search-cancel-button,
+.qc-search__input::-webkit-search-results-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.qc-search__btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 42px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  transition: color 0.15s;
+  border-radius: 0 8px 8px 0;
+  padding: 0;
+}
+
+.qc-search__btn:hover {
+  color: #1a1a1a;
+}
+
+/* ── Header Actions ───────────────────────────────────────── */
+.qc-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.qc-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #555;
+  position: relative;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.qc-action-btn:hover {
+  background: #f2f2f0;
+  color: #1a1a1a;
+}
+
+.qc-cart-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-family: inherit;
+}
+
+/* ── Category Nav Bar ─────────────────────────────────────── */
+.qc-nav {
+  border-top: 1px solid #ebebeb;
+  padding: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.qc-nav::-webkit-scrollbar { display: none; }
+
+.qc-nav__list {
+  max-width: var(--qc-max-width, 1280px);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 0;
+  white-space: nowrap;
+}
+
+.qc-nav__item {
+  flex-shrink: 0;
+}
+
+.qc-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 14px;
+  height: 42px;
+  font-size: 13px;
+  color: #666;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.1s ease, border-color 0.1s ease;
+  white-space: nowrap;
+}
+
+.qc-nav__link:hover {
+  color: #1a1a1a;
+}
+
+.qc-nav__link--active,
+.qc-nav__link[aria-current="page"] {
+  color: var(--accent, #0f6e56);
+  border-bottom-color: var(--accent, #0f6e56);
+  font-weight: 600;
+}
+
+.qc-nav__pill {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* ── Pincode Modal ────────────────────────────────────────── */
+.qc-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 90px 16px 16px;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: qc-fade-in 0.15s ease;
+}
+
+.qc-modal-overlay[hidden] {
+  display: none;
+}
+
+@keyframes qc-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.qc-modal {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  padding: 22px 20px 20px;
+  width: 100%;
+  max-width: 340px;
+  position: relative;
+  animation: qc-slide-in 0.18s ease;
+}
+
+@keyframes qc-slide-in {
+  from { transform: translateY(-8px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.qc-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #aaa;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.15s;
+  font-family: inherit;
+}
+
+.qc-modal__close:hover { color: #1a1a1a; }
+
+.qc-modal__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 4px;
+}
+
+.qc-modal__desc {
+  font-size: 13px;
+  color: #777;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.qc-modal__row {
+  display: flex;
+  gap: 8px;
+}
+
+.qc-modal__input {
+  flex: 1;
+  height: 42px;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  outline: none;
+  background: #f8f8f6;
+  color: #1a1a1a;
+  transition: border-color 0.15s;
+  font-family: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.qc-modal__input:focus {
+  border-color: #0f6e56;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(15, 110, 86, 0.08);
+}
+
+.qc-modal__input::placeholder {
+  color: #bbb;
+}
+
+.qc-modal__submit {
+  height: 42px;
+  padding: 0 18px;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+
+.qc-modal__submit:hover { opacity: 0.88; }
+.qc-modal__submit:active { opacity: 0.78; }
+
+.qc-modal__result {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: #e1f5ee;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: qc-fade-in 0.2s ease;
+}
+
+.qc-modal__result[hidden] { display: none; }
+
+.qc-modal__result-text {
+  font-size: 13px;
+  color: #085041;
+  line-height: 1.4;
+}
+
+.qc-modal__result-text strong {
+  font-weight: 600;
+}
+
+.qc-modal__note {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #c0392b;
+}
+
+.qc-modal__note[hidden] { display: none; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .qc-pincode-trigger {
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .qc-header {
+    max-width: 100%;
+    padding: 10px 16px;
+    height: auto;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .qc-header__logo  { order: 1; }
+  .qc-header__actions { order: 2; margin-left: auto; }
+
+  .qc-pincode-trigger {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    min-width: unset;
+  }
+
+  .qc-search {
+    order: 4;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .qc-nav__list { padding: 0 16px; }
+}
+
+@media (max-width: 480px) {
+  .qc-logo__name {
+    font-size: 16px;
+  }
+
+  .qc-delivery-badge {
+    display: none;
+  }
+
+  .qc-modal-overlay {
+    padding-top: 70px;
+    align-items: flex-start;
+  }
+}

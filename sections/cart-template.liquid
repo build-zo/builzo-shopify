@@ -1,0 +1,599 @@
+{% comment %}
+  FILE: sections/cart-template.liquid
+  Delivery tiers match Shopify local delivery rules:
+  ₹0–₹999 → ₹250 | ₹1,000–₹4,999 → ₹150 | ₹5,000+ → FREE
+{% endcomment %}
+
+{%- assign t1_max  = section.settings.tier1_max  | default: 1000  | times: 100 -%}
+{%- assign t2_max  = section.settings.tier2_max  | default: 5000  | times: 100 -%}
+{%- assign fee1    = section.settings.fee_tier1  | default: 250   | times: 100 -%}
+{%- assign fee2    = section.settings.fee_tier2  | default: 150   | times: 100 -%}
+{%- assign ctotal  = cart.total_price -%}
+
+{%- assign delivery_fee = fee1 -%}
+{%- assign is_free      = false -%}
+{%- assign next_tier    = t1_max -%}
+
+{%- if ctotal >= t2_max -%}
+  {%- assign delivery_fee = 0 -%}
+  {%- assign is_free      = true -%}
+  {%- assign next_tier    = t2_max -%}
+{%- elsif ctotal >= t1_max -%}
+  {%- assign delivery_fee = fee2 -%}
+  {%- assign next_tier    = t2_max -%}
+{%- endif -%}
+
+{%- assign remaining = next_tier | minus: ctotal -%}
+{%- assign progress  = ctotal | times: 100 | divided_by: t2_max | at_most: 100 -%}
+
+<section class="qc-cart" data-section-id="{{ section.id }}">
+  <div class="qc-cart__inner">
+
+    <h1 class="qc-cart__title">
+      {{ section.settings.title | default: 'My Cart' }}
+      {%- if cart.item_count > 0 -%}
+        <span class="qc-cart__count">({{ cart.item_count }} item{%- if cart.item_count != 1 -%}s{%- endif -%})</span>
+      {%- endif -%}
+    </h1>
+
+    {%- if cart.item_count > 0 -%}
+
+      <!-- Free delivery bar -->
+      <!-- Delivery message — simple alert -->
+      <div class="qc-cart__delivery-msg">
+        {%- if is_free -%}
+          <span class="qc-cart__delivery-msg__icon">🎉</span>
+          <div class="qc-cart__delivery-msg__body">
+            <p class="qc-cart__delivery-msg__text">You've unlocked <strong>free delivery</strong> on this order!</p>
+          </div>
+        {%- elsif ctotal >= t1_max -%}
+          <span class="qc-cart__delivery-msg__icon">🚚</span>
+          <div class="qc-cart__delivery-msg__body">
+            <p class="qc-cart__delivery-msg__text">Add <strong>₹{{ remaining | money_without_currency }}</strong> more for <strong>free delivery</strong></p>
+            <p class="qc-cart__delivery-msg__sub">Current delivery charge: ₹{{ section.settings.fee_tier2 | default: 150 }}</p>
+          </div>
+        {%- else -%}
+          <span class="qc-cart__delivery-msg__icon">🚚</span>
+          <div class="qc-cart__delivery-msg__body">
+            <p class="qc-cart__delivery-msg__text">Add <strong>₹{{ remaining | money_without_currency }}</strong> more to reduce delivery charges</p>
+            <p class="qc-cart__delivery-msg__sub">Current: ₹{{ section.settings.fee_tier1 | default: 250 }} → ₹{{ section.settings.fee_tier2 | default: 150 }} after ₹{{ section.settings.tier1_max | default: 1000 }} → Free after ₹{{ section.settings.tier2_max | default: 5000 }}</p>
+          </div>
+        {%- endif -%}
+      </div>
+
+
+      <!-- Pincode bar -->
+      <div class="qc-cart__pincode-bar">
+        <span data-qc-delivery-promise>
+          ⚡ Delivering to <strong data-qc-delivery-area>your area</strong> in <strong data-qc-delivery-time>–</strong>
+        </span>
+        <button class="qc-cart__change-pincode" id="cartChangePincode" type="button">
+          📍 <span data-qc-pincode>Enter pincode</span>
+          <span class="qc-cart__change-link">Change</span>
+        </button>
+      </div>
+
+      <div class="qc-cart__layout">
+
+        <!-- Cart items -->
+        <div class="qc-cart__items" id="qcCartItems">
+          {%- for item in cart.items -%}
+            <div class="qc-cart-item" data-key="{{ item.key }}">
+              <a href="{{ item.url }}" class="qc-cart-item__img-wrap" tabindex="-1" aria-hidden="true">
+                {%- if item.image -%}
+                  <img src="{{ item.image | image_url: width: 160 }}" alt="{{ item.image.alt | escape }}" width="80" height="80" loading="lazy" class="qc-cart-item__img" />
+                {%- else -%}
+                  <div class="qc-cart-item__img-placeholder"></div>
+                {%- endif -%}
+              </a>
+
+              <div class="qc-cart-item__body">
+                <a href="{{ item.url }}" class="qc-cart-item__title">{{ item.product.title }}</a>
+                {%- unless item.product.has_only_default_variant -%}
+                  <p class="qc-cart-item__variant">{{ item.variant.title }}</p>
+                {%- endunless -%}
+                {%- for d in item.line_level_discount_allocations -%}
+                  <p class="qc-cart-item__discount-tag">🏷️ {{ d.discount_application.title }} (−{{ d.amount | money }})</p>
+                {%- endfor -%}
+                <div class="qc-cart-item__footer">
+                  <div class="qc-cart-item__price-wrap">
+                    <span class="qc-cart-item__price">{{ item.final_line_price | money }}</span>
+                    {%- if item.original_line_price != item.final_line_price -%}
+                      <s class="qc-cart-item__original-price">{{ item.original_line_price | money }}</s>
+                    {%- endif -%}
+                  </div>
+                  <div class="qc-cart-item__qty-wrap">
+                    <button class="qc-qty-btn" data-key="{{ item.key }}" data-qty="{{ item.quantity | minus: 1 }}" type="button" aria-label="Decrease">−</button>
+                    <span class="qc-qty-value">{{ item.quantity }}</span>
+                    <button class="qc-qty-btn" data-key="{{ item.key }}" data-qty="{{ item.quantity | plus: 1 }}" type="button" aria-label="Increase">+</button>
+                  </div>
+                </div>
+              </div>
+
+              <button class="qc-cart-item__remove" data-key="{{ item.key }}" type="button" aria-label="Remove {{ item.product.title | escape }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+              </button>
+            </div>
+          {%- endfor -%}
+        </div>
+
+        <!-- Order summary -->
+        <aside class="qc-cart__summary">
+          <h2 class="qc-cart__summary-title">Order Summary</h2>
+
+          <div class="qc-cart__summary-rows">
+
+            <div class="qc-cart__summary-row">
+              <span>Subtotal</span>
+              <span>{{ cart.items_subtotal_price | money }}</span>
+            </div>
+
+            {%- for d in cart.cart_level_discount_applications -%}
+              <div class="qc-cart__summary-row qc-cart__summary-row--discount">
+                <span>🏷️ {{ d.title }}{%- if d.value_type == 'percentage' -%} ({{ d.value }}% off){%- endif -%}</span>
+                <span>−{{ d.total_allocated_amount | money }}</span>
+              </div>
+            {%- endfor -%}
+
+            <!-- Delivery fee — matches Shopify tiered rules -->
+            <div class="qc-cart__summary-row">
+              <span>Delivery</span>
+              <span>
+                {%- if is_free -%}
+                  <span class="qc-cart__free-tag">FREE</span>
+                {%- else -%}
+                  <span class="qc-cart__delivery-fee">{{ delivery_fee | money }}</span>
+                {%- endif -%}
+              </span>
+            </div>
+
+            <div class="qc-cart__summary-row qc-cart__summary-row--tax">
+              <span>Tax</span>
+              <span>
+                {%- if cart.taxes_included -%}
+                  Included
+                {%- elsif cart.tax_price > 0 -%}
+                  {{ cart.tax_price | money }}
+                {%- else -%}
+                  At checkout
+                {%- endif -%}
+              </span>
+            </div>
+
+          </div>
+
+          <!-- Total including delivery -->
+          <div class="qc-cart__summary-total">
+            <span>Total</span>
+            <span>{{ ctotal | plus: delivery_fee | money }}</span>
+          </div>
+
+          {%- if cart.total_discounts > 0 -%}
+            <p class="qc-cart__savings-badge">🎉 You're saving {{ cart.total_discounts | money }}!</p>
+          {%- endif -%}
+
+          <!-- Discount code -->
+          <div class="qc-cart__coupon">
+            <label for="qcDiscountCode" class="qc-cart__coupon-label">Discount code</label>
+            <div class="qc-cart__coupon-row">
+              <input type="text" id="qcDiscountCode" class="qc-cart__coupon-input" placeholder="Enter code" autocapitalize="characters" autocomplete="off" />
+              <button type="button" id="qcApplyCode" class="qc-cart__coupon-btn" style="background:var(--qc-accent,#0f6e56);">Apply</button>
+            </div>
+            <p class="qc-cart__coupon-note" id="qcCodeNote">Applied at checkout</p>
+          </div>
+
+          {%- if section.settings.show_cart_note -%}
+            <div class="qc-cart__note">
+              <label for="qcCartNote" class="qc-cart__note-label">{{ section.settings.cart_note_label | default: 'Order notes' }}</label>
+              <textarea id="qcCartNote" class="qc-cart__note-input" rows="3">{{ cart.note }}</textarea>
+            </div>
+          {%- endif -%}
+
+          <!-- ── APP BLOCKS — rendered before GST (e.g. Sell Easy carousel) ── -->
+          {%- if section.settings.show_app_slot -%}
+            {%- assign has_app_blocks = false -%}
+            {%- for block in section.blocks -%}
+              {%- if block.type == '@app' -%}
+                {%- assign has_app_blocks = true -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if has_app_blocks -%}
+              <div class="qc-cart__app-slot">
+                {%- if section.settings.app_slot_label != blank -%}
+                  <p class="qc-cart__app-slot__label">{{ section.settings.app_slot_label }}</p>
+                {%- endif -%}
+                {%- for block in section.blocks -%}
+                  {%- if block.type == '@app' -%}
+                    {% render block %}
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+
+          <!-- GST Number — saved as cart attribute, visible in Shopify order -->
+          {%- if section.settings.show_gst_field -%}
+            <div class="qc-cart__gst">
+              <label for="qcGstNumber" class="qc-cart__gst-label">
+                {{ section.settings.gst_label | default: 'GST Number' }}
+                <span class="qc-cart__gst-optional">(optional)</span>
+              </label>
+              <input
+                type="text"
+                id="qcGstNumber"
+                class="qc-cart__gst-input"
+                placeholder="e.g. 03ABCDE1234F1Z5"
+                maxlength="15"
+                autocapitalize="characters"
+                autocomplete="off"
+                spellcheck="false"
+                value="{{ cart.attributes.gst_number }}"
+              />
+              <span class="qc-cart__gst-status" id="qcGstStatus" aria-live="polite"></span>
+              <p class="qc-cart__gst-note">{{ section.settings.gst_help_text | default: 'Enter your 15-digit GSTIN for a GST invoice.' }}</p>
+            </div>
+          {%- endif -%}
+
+          <!-- CHECKOUT FORM — POST to Shopify, passes GST as cart attribute -->
+          <form id="qcCheckoutForm" action="/checkout" method="post">
+            <input type="hidden" name="discount" id="qcDiscountHidden" value="" />
+            <!-- GST passed as cart attribute — shows in Shopify order details -->
+            <input type="hidden" name="attributes[GST Number]" id="qcGstFormHidden" value="{{ cart.attributes['GST Number'] }}" />
+            <button
+              type="submit"
+              class="qc-cart__checkout-btn"
+              style="background:var(--qc-accent,#0f6e56); border:none; width:100%; cursor:pointer; font-family:inherit;"
+            >
+              {{ section.settings.checkout_label | default: 'Proceed to Checkout' }}
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </form>
+
+          {%- if section.settings.show_dynamic_checkout -%}
+            <div class="qc-cart__dynamic-checkout">{{ cart | payment_terms }}</div>
+          {%- endif -%}
+
+          <a href="{{ routes.root_url }}" class="qc-cart__continue">← Continue Shopping</a>
+
+          <div class="qc-cart__trust">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Secure checkout by Shopify</span>
+          </div>
+
+          <div class="qc-cart__payment-icons">
+            {%- for type in shop.enabled_payment_types -%}
+              {{ type | payment_type_svg_tag: class: 'qc-footer__payment-icon' }}
+            {%- endfor -%}
+          </div>
+
+        </aside>
+      </div>
+
+    {%- else -%}
+
+      <div class="qc-cart__empty">
+        <div class="qc-cart__empty-icon">🛒</div>
+        <h2 class="qc-cart__empty-title">{{ section.settings.empty_title | default: 'Your cart is empty' }}</h2>
+        <p class="qc-cart__empty-desc">{{ section.settings.empty_desc | default: "Looks like you haven't added anything yet." }}</p>
+        <a href="{{ routes.root_url }}" class="qc-cart__checkout-btn" style="background:var(--qc-accent,#0f6e56);">
+          {{ section.settings.empty_btn_label | default: 'Start Shopping' }}
+        </a>
+      </div>
+
+    {%- endif -%}
+
+    <!-- Blocks -->
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'trust_badge' -%}
+          <div class="qc-cart-block qc-cart-block--trust" {{ block.shopify_attributes }}>
+            <span>{{ block.settings.icon }}</span><span>{{ block.settings.text }}</span>
+          </div>
+        {%- when 'usp_row' -%}
+          <div class="qc-cart-block qc-cart-block--usps" {{ block.shopify_attributes }}>
+            {%- if block.settings.usp1 != blank -%}<span>{{ block.settings.usp1 }}</span>{%- endif -%}
+            {%- if block.settings.usp2 != blank -%}<span>{{ block.settings.usp2 }}</span>{%- endif -%}
+            {%- if block.settings.usp3 != blank -%}<span>{{ block.settings.usp3 }}</span>{%- endif -%}
+          </div>
+        {%- when 'promo_text' -%}
+          <div class="qc-cart-block qc-cart-block--promo" style="background:{{ block.settings.bg }};" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+        {%- when '@app' -%}
+          {% render block %}
+      {%- endcase -%}
+    {%- endfor -%}
+
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Qty / Remove via AJAX then reload ──────────────────── */
+  function cartChange(key, qty) {
+    document.getElementById('qcCartItems').style.opacity = '0.4';
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ id: key, quantity: qty })
+    })
+    .then(function() { window.location.reload(); })
+    .catch(function() { window.location.reload(); });
+  }
+
+  document.addEventListener('click', function(e) {
+    var qtyBtn    = e.target.closest('.qc-qty-btn');
+    var removeBtn = e.target.closest('.qc-cart-item__remove');
+    if (qtyBtn)    cartChange(qtyBtn.dataset.key,    Math.max(0, parseInt(qtyBtn.dataset.qty, 10)));
+    if (removeBtn) cartChange(removeBtn.dataset.key, 0);
+  });
+
+  /* ── Discount code → passes to checkout form ────────────── */
+  var codeInput   = document.getElementById('qcDiscountCode');
+  var applyBtn    = document.getElementById('qcApplyCode');
+  var codeNote    = document.getElementById('qcCodeNote');
+  var hiddenCode  = document.getElementById('qcDiscountHidden');
+
+  if (applyBtn && codeInput) {
+    applyBtn.addEventListener('click', function() {
+      var code = codeInput.value.trim().toUpperCase();
+      if (!code) return;
+      if (hiddenCode) hiddenCode.value = code;
+      applyBtn.textContent      = '✓ Applied';
+      applyBtn.style.background = '#16a34a';
+      if (codeNote) { codeNote.textContent = '"' + code + '" applied at checkout'; codeNote.style.color = '#16a34a'; }
+    });
+    codeInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') applyBtn.click(); });
+  }
+
+  /* ── GST Number — validate + auto-save to cart attribute ─── */
+  var gstInput  = document.getElementById('qcGstNumber');
+  var gstHidden = document.getElementById('qcGstFormHidden');
+  var gstStatus = document.getElementById('qcGstStatus');
+  var GST_RE    = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+
+  if (gstInput) {
+    var gstTimer;
+    gstInput.addEventListener('input', function () {
+      var val = this.value.trim().toUpperCase();
+      this.value = val;
+      if (gstHidden) gstHidden.value = val;
+      clearTimeout(gstTimer);
+
+      if (!val) { setGstStatus('', ''); saveGst(''); return; }
+      if (val.length < 15) { setGstStatus('typing', ''); return; }
+
+      if (GST_RE.test(val)) {
+        setGstStatus('valid', '\u2713 Valid GSTIN');
+        gstTimer = setTimeout(function () { saveGst(val); }, 600);
+      } else {
+        setGstStatus('invalid', '\u2717 Invalid format (must be 15 chars like 03ABCDE1234F1Z5)');
+      }
+    });
+  }
+
+  function setGstStatus(type, msg) {
+    if (!gstStatus) return;
+    gstStatus.textContent = msg;
+    gstStatus.className = 'qc-cart__gst-status qc-cart__gst-status--' + type;
+  }
+
+  function saveGst(val) {
+    var body = { attributes: {} };
+    body['attributes']['GST Number'] = val;
+    fetch('/cart/update.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).catch(function () {});
+  }
+
+  /* ── Cart note ───────────────────────────────────────────── */
+  var noteEl = document.getElementById('qcCartNote');
+  if (noteEl) {
+    var t;
+    noteEl.addEventListener('input', function() {
+      clearTimeout(t);
+      var val = this.value;
+      t = setTimeout(function() {
+        fetch('/cart/update.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ note: val })
+        });
+      }, 800);
+    });
+  }
+
+  /* ── Change pincode ──────────────────────────────────────── */
+  var pBtn = document.getElementById('cartChangePincode');
+  if (pBtn) {
+    pBtn.addEventListener('click', function() {
+      var p = document.getElementById('qcPincodeBtn');
+      if (p) p.click();
+    });
+  }
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Cart",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Page title",
+      "default": "My Cart"
+    },
+    {
+      "type": "text",
+      "id": "checkout_label",
+      "label": "Checkout button text",
+      "default": "Proceed to Checkout"
+    },
+    {
+      "type": "text",
+      "id": "empty_title",
+      "label": "Empty cart heading",
+      "default": "Your cart is empty"
+    },
+    {
+      "type": "text",
+      "id": "empty_desc",
+      "label": "Empty cart subtext",
+      "default": "Looks like you haven't added anything yet."
+    },
+    {
+      "type": "text",
+      "id": "empty_btn_label",
+      "label": "Empty cart button",
+      "default": "Start Shopping"
+    },
+    {
+      "type": "header",
+      "content": "Delivery Charges"
+    },
+    {
+      "type": "paragraph",
+      "content": "Set these to match your Shopify local delivery zone rules exactly."
+    },
+    {
+      "type": "number",
+      "id": "tier1_max",
+      "label": "Tier 1 upper limit (₹)",
+      "default": 1000,
+      "info": "Orders BELOW this get fee 1. Matches 'Orders from ₹0 up to' in Shopify."
+    },
+    {
+      "type": "number",
+      "id": "fee_tier1",
+      "label": "Delivery fee for Tier 1 (₹)",
+      "default": 250,
+      "info": "e.g. ₹250 for orders under ₹1,000"
+    },
+    {
+      "type": "number",
+      "id": "tier2_max",
+      "label": "Free delivery above (₹)",
+      "default": 5000,
+      "info": "Orders AT or ABOVE this get free delivery. Matches your ₹5,000 free rule."
+    },
+    {
+      "type": "number",
+      "id": "fee_tier2",
+      "label": "Delivery fee for Tier 2 (₹)",
+      "default": 150,
+      "info": "e.g. ₹150 for orders between ₹1,000 and ₹4,999"
+    },
+    {
+      "type": "header",
+      "content": "Checkout"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "Show Shop Pay / Google Pay",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "App Block Slot"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_app_slot",
+      "label": "Show app block slot",
+      "default": true,
+      "info": "Shows the slot before the GST field. Add your Sell Easy or any other app block here via 'Add block' below."
+    },
+    {
+      "type": "text",
+      "id": "app_slot_label",
+      "label": "Slot label (optional)",
+      "info": "e.g. 'Add Unloading Service' — leave blank for no label"
+    },
+    {
+      "type": "header",
+      "content": "GST Number"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gst_field",
+      "label": "Show GST number field",
+      "default": true,
+      "info": "Collected before checkout. Saved to order as a cart attribute — visible in Shopify Admin under the order."
+    },
+    {
+      "type": "text",
+      "id": "gst_label",
+      "label": "Field label",
+      "default": "GST Number"
+    },
+    {
+      "type": "text",
+      "id": "gst_help_text",
+      "label": "Help text below field",
+      "default": "Enter your 15-digit GSTIN for a GST invoice. Leave blank to skip."
+    },
+    {
+      "type": "header",
+      "content": "Order Notes"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_note",
+      "label": "Show order notes field",
+      "default": false,
+      "info": "Enable 'Order notes' in Settings → Checkout first"
+    },
+    {
+      "type": "text",
+      "id": "cart_note_label",
+      "label": "Notes label",
+      "default": "Order notes (optional)"
+    },
+    {
+      "type": "text",
+      "id": "cart_note_placeholder",
+      "label": "Notes placeholder",
+      "default": "Special instructions..."
+    }
+  ],
+  "blocks": [
+    { "type": "@app" },
+    {
+      "type": "trust_badge",
+      "name": "Trust Badge",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Emoji", "default": "🔒" },
+        { "type": "text", "id": "text", "label": "Text", "default": "100% Secure Checkout" }
+      ]
+    },
+    {
+      "type": "usp_row",
+      "name": "USP Row",
+      "settings": [
+        { "type": "text", "id": "usp1", "label": "USP 1", "default": "⚡ 10-min delivery" },
+        { "type": "text", "id": "usp2", "label": "USP 2", "default": "↩️ Easy returns" },
+        { "type": "text", "id": "usp3", "label": "USP 3", "default": "🌿 Fresh quality" }
+      ]
+    },
+    {
+      "type": "promo_text",
+      "name": "Promo Message",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Message", "default": "🎉 Use code SAVE10 for 10% off!" },
+        { "type": "color", "id": "bg", "label": "Background", "default": "#fef9c3" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Cart" }]
+}
+{% endschema %}

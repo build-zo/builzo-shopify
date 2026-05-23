@@ -1,0 +1,128 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement_UJreYU": {
+          "type": "announcement",
+          "settings": {
+            "text": "Free Delivery on Orders above ₹5000",
+            "link": ""
+          }
+        },
+        "announcement-bar-0": {
+          "type": "announcement",
+          "settings": {
+            "text": "Now Serving in Bathinda with ❤️",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "announcement_UJreYU",
+        "announcement-bar-0"
+      ],
+      "settings": {
+        "auto_rotate": true,
+        "change_slides_speed": 3,
+        "color_scheme": "scheme-1",
+        "show_line_separator": true,
+        "show_social": false,
+        "enable_country_selector": false,
+        "enable_language_selector": false
+      }
+    },
+    "header": {
+      "type": "header",
+      "blocks": {
+        "pincode_YX4iWx": {
+          "type": "pincode",
+          "settings": {
+            "pincode": "151001",
+            "area": "Bathinda",
+            "time": "90 min"
+          }
+        }
+      },
+      "block_order": [
+        "pincode_YX4iWx"
+      ],
+      "settings": {
+        "logo": "shopify://shop_images/ChatGPT_Image_May_21_2026_10_04_21_PM.png",
+        "logo_width": 120,
+        "logo_height": 40,
+        "logo_fit": "cover",
+        "store_name_size": 18,
+        "store_name_color": "#1a1a1a",
+        "store_name_weight": "600",
+        "header_bg": "#ffffff",
+        "header_border": "#e8e8e8",
+        "header_height": 64,
+        "accent_color": "#0f6e56",
+        "show_search": true,
+        "search_placeholder": "Search for Cement, Adhesive, Paint",
+        "search_bg": "#f8f8f6",
+        "search_border": "#e2e2e2",
+        "search_text": "#1a1a1a",
+        "search_height": 40,
+        "search_radius": 8,
+        "search_font_size": 14,
+        "show_account": true,
+        "icon_color": "#555555",
+        "icon_hover_bg": "#f2f2f0",
+        "icon_size": 22,
+        "show_pincode": true,
+        "deliver_to_label": "Deliver to",
+        "pincode_bg": "#f8f8f6",
+        "pincode_border": "#e2e2e2",
+        "pincode_label_color": "#888888",
+        "pincode_value_color": "#1a1a1a",
+        "pincode_radius": 8,
+        "pincode_label_size": 10,
+        "pincode_value_size": 13,
+        "badge_text_color": "#0f6e56",
+        "badge_font_size": 11,
+        "show_nav": true,
+        "menu": "main-menu",
+        "nav_bg": "#ffffff",
+        "nav_border": "#ebebeb",
+        "nav_height": 42,
+        "nav_link_color": "#666666",
+        "nav_active_color": "#0f6e56",
+        "nav_font_size": 13,
+        "nav_font_weight": "400",
+        "nav_active_weight": "600",
+        "show_announcement": false,
+        "ann_bg": "#0f6e56",
+        "ann_text_color": "#ffffff",
+        "ann_font_size": 12,
+        "ann_height": 32,
+        "announcement_text": "Free delivery on orders above ₹5000",
+        "promo_code": "",
+        "modal_radius": 12,
+        "modal_title": "Enter your pincode",
+        "modal_desc": "We'll show delivery time and available products for your area.",
+        "modal_placeholder": "e.g. 151001",
+        "modal_btn": "Check",
+        "default_pincode": "151001",
+        "default_area": "Bathinda",
+        "default_delivery_time": "90 min"
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "header"
+  ]
+}

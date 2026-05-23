@@ -1,0 +1,571 @@
+{% doc %}
+  @prompt
+    Cards showing categories of different types of products we offer
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-category-cards-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+  }
+
+  .ai-category-cards-container-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: {{ block.settings.card_spacing }}px;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-category-card-{{ ai_gen_id }} {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: {{ block.settings.card_background_color }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-category-card-{{ ai_gen_id }}:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-category-card-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ block.settings.image_aspect_ratio }};
+    overflow: hidden;
+  }
+
+  .ai-category-card-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-category-card-{{ ai_gen_id }}:hover .ai-category-card-image-{{ ai_gen_id }} {
+    transform: scale(1.05);
+  }
+
+  .ai-category-card-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-category-card-image-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-category-card-content-{{ ai_gen_id }} {
+    padding: {{ block.settings.card_padding }}px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+  }
+
+  .ai-category-card-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_font_size }}px;
+    font-weight: 600;
+    color: {{ block.settings.title_color }};
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .ai-category-card-description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_font_size }}px;
+    color: {{ block.settings.description_color }};
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .ai-category-card-cta-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: {{ block.settings.cta_font_size }}px;
+    color: {{ block.settings.cta_color }};
+    font-weight: 500;
+    margin-top: auto;
+  }
+
+  .ai-category-card-cta-arrow-{{ ai_gen_id }} {
+    transition: transform 0.3s ease;
+  }
+
+  .ai-category-card-{{ ai_gen_id }}:hover .ai-category-card-cta-arrow-{{ ai_gen_id }} {
+    transform: translateX(4px);
+  }
+
+  .ai-category-empty-state-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    font-size: 14px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-category-cards-container-{{ ai_gen_id }} {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: {{ block.settings.card_spacing | times: 0.75 }}px;
+    }
+
+    .ai-category-card-content-{{ ai_gen_id }} {
+      padding: {{ block.settings.card_padding | times: 0.75 }}px;
+    }
+  }
+{% endstyle %}
+
+<category-cards-{{ ai_gen_id }} class="ai-category-cards-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% liquid
+    assign has_any_category = false
+    for i in (1..6)
+      assign category_enabled_key = 'category_' | append: i | append: '_enabled'
+      if block.settings[category_enabled_key]
+        assign has_any_category = true
+        break
+      endif
+    endfor
+  %}
+
+  {% if has_any_category %}
+    <div class="ai-category-cards-container-{{ ai_gen_id }}">
+      {% for i in (1..6) %}
+        {% liquid
+          assign category_enabled_key = 'category_' | append: i | append: '_enabled'
+          assign category_title_key = 'category_' | append: i | append: '_title'
+          assign category_description_key = 'category_' | append: i | append: '_description'
+          assign category_image_key = 'category_' | append: i | append: '_image'
+          assign category_link_key = 'category_' | append: i | append: '_link'
+
+          assign category_enabled = block.settings[category_enabled_key]
+          assign category_title = block.settings[category_title_key]
+          assign category_description = block.settings[category_description_key]
+          assign category_image = block.settings[category_image_key]
+          assign category_link = block.settings[category_link_key]
+        %}
+
+        {% if category_enabled %}
+          <a
+            href="{{ category_link | default: '#' }}"
+            class="ai-category-card-{{ ai_gen_id }}"
+          >
+            <div class="ai-category-card-image-wrapper-{{ ai_gen_id }}">
+              {% if category_image %}
+                <img
+                  src="{{ category_image | image_url: width: 600 }}"
+                  alt="{{ category_image.alt | escape }}"
+                  loading="lazy"
+                  width="600"
+                  height="{{ 600 | divided_by: block.settings.image_aspect_ratio | round }}"
+                  class="ai-category-card-image-{{ ai_gen_id }}"
+                >
+              {% else %}
+                <div class="ai-category-card-image-placeholder-{{ ai_gen_id }}">
+                  {{ 'collection-apparel-1' | placeholder_svg_tag }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="ai-category-card-content-{{ ai_gen_id }}">
+              {% if category_title != blank %}
+                <h3 class="ai-category-card-title-{{ ai_gen_id }}">{{ category_title }}</h3>
+              {% endif %}
+
+              {% if category_description != blank %}
+                <p class="ai-category-card-description-{{ ai_gen_id }}">{{ category_description }}</p>
+              {% endif %}
+
+              <span class="ai-category-card-cta-{{ ai_gen_id }}">
+                {{ block.settings.cta_text }}
+                <span class="ai-category-card-cta-arrow-{{ ai_gen_id }}">→</span>
+              </span>
+            </div>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="ai-category-empty-state-{{ ai_gen_id }}">
+      Enable at least one category to display cards
+    </div>
+  {% endif %}
+</category-cards-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class CategoryCards{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.cards = this.querySelectorAll('.ai-category-card-{{ ai_gen_id }}');
+        this.setupAccessibility();
+      }
+
+      setupAccessibility() {
+        this.cards.forEach((card) => {
+          card.setAttribute('role', 'link');
+        });
+      }
+    }
+
+    customElements.define('category-cards-{{ ai_gen_id }}', CategoryCards{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product category cards",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "card_spacing",
+      "label": "Card spacing",
+      "min": 8,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "Card padding",
+      "min": 12,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Image aspect ratio",
+      "options": [
+        {
+          "value": "1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "1.33",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "1.5",
+          "label": "Wide (3:2)"
+        },
+        {
+          "value": "0.75",
+          "label": "Portrait (3:4)"
+        }
+      ],
+      "default": "1.33"
+    },
+    {
+      "type": "header",
+      "content": "Card style"
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Text style"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Title size",
+      "min": 14,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#0e1b4d"
+    },
+    {
+      "type": "range",
+      "id": "description_font_size",
+      "label": "Description size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "cta_font_size",
+      "label": "CTA size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "cta_color",
+      "label": "CTA color",
+      "default": "#4770db"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA text",
+      "default": "Explore"
+    },
+    {
+      "type": "header",
+      "content": "Category 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "category_1_enabled",
+      "label": "Enable category 1",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "category_1_title",
+      "label": "Title",
+      "default": "Electronics"
+    },
+    {
+      "type": "textarea",
+      "id": "category_1_description",
+      "label": "Description",
+      "default": "Discover our latest tech gadgets and devices"
+    },
+    {
+      "type": "image_picker",
+      "id": "category_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "category_1_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Category 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "category_2_enabled",
+      "label": "Enable category 2",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "category_2_title",
+      "label": "Title",
+      "default": "Clothing"
+    },
+    {
+      "type": "textarea",
+      "id": "category_2_description",
+      "label": "Description",
+      "default": "Browse our fashion collection for all seasons"
+    },
+    {
+      "type": "image_picker",
+      "id": "category_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "category_2_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Category 3"
+    },
+    {
+      "type": "checkbox",
+      "id": "category_3_enabled",
+      "label": "Enable category 3",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "category_3_title",
+      "label": "Title",
+      "default": "Home & Living"
+    },
+    {
+      "type": "textarea",
+      "id": "category_3_description",
+      "label": "Description",
+      "default": "Transform your space with our curated selection"
+    },
+    {
+      "type": "image_picker",
+      "id": "category_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "category_3_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Category 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "category_4_enabled",
+      "label": "Enable category 4",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "category_4_title",
+      "label": "Title",
+      "default": "Sports & Outdoors"
+    },
+    {
+      "type": "textarea",
+      "id": "category_4_description",
+      "label": "Description",
+      "default": "Gear up for your next adventure"
+    },
+    {
+      "type": "image_picker",
+      "id": "category_4_image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "category_4_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Category 5"
+    },
+    {
+      "type": "checkbox",
+      "id": "category_5_enabled",
+      "label": "Enable category 5",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "category_5_title",
+      "label": "Title",
+      "default": "Beauty & Care"
+    },
+    {
+      "type": "textarea",
+      "id": "category_5_description",
+      "label": "Description",
+      "default": "Premium beauty products for your daily routine"
+    },
+    {
+      "type": "image_picker",
+      "id": "category_5_image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "category_5_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Category 6"
+    },
+    {
+      "type": "checkbox",
+      "id": "category_6_enabled",
+      "label": "Enable category 6",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "category_6_title",
+      "label": "Title",
+      "default": "Accessories"
+    },
+    {
+      "type": "textarea",
+      "id": "category_6_description",
+      "label": "Description",
+      "default": "Complete your look with our accessories"
+    },
+    {
+      "type": "image_picker",
+      "id": "category_6_image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "category_6_link",
+      "label": "Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product category cards"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,477 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "bz-hero",
+      "blocks": {
+        "usp1": {
+          "type": "usp",
+          "settings": {
+            "icon": "⚡",
+            "text": "60-90 Min Delivery"
+          }
+        },
+        "usp2": {
+          "type": "usp",
+          "settings": {
+            "icon": "🏷️",
+            "text": "Best Prices Guaranteed"
+          }
+        },
+        "usp3": {
+          "type": "usp",
+          "settings": {
+            "icon": "✅",
+            "text": "Trusted by Builders"
+          }
+        },
+        "cta1": {
+          "type": "cta_button",
+          "settings": {
+            "label": "Shop Now",
+            "url": "",
+            "style": "primary",
+            "icon": ""
+          }
+        },
+        "cta2": {
+          "type": "cta_button",
+          "settings": {
+            "label": "Bulk Order",
+            "url": "",
+            "style": "primary",
+            "icon": ""
+          }
+        }
+      },
+      "block_order": [
+        "usp1",
+        "usp2",
+        "usp3",
+        "cta1",
+        "cta2"
+      ],
+      "settings": {
+        "bg_color": "#141416",
+        "txt_color": "#ffffff",
+        "eyebrow": "Bathinda's",
+        "eyebrow_color": "#f5a623",
+        "eyebrow_size": 22,
+        "eyebrow_transform": "capitalize",
+        "heading": "Fastest Delivery of Construction Materials",
+        "heading_color": "#ffffff",
+        "heading_size": 40,
+        "heading_weight": "800",
+        "subheading": "Building your dreams, delivered in minutes.",
+        "subheading_color": "#ffffff",
+        "subheading_size": 15,
+        "subheading_opacity": 80,
+        "bg_image": "shopify://shop_images/ChatGPT_Image_May_22_2026_05_18_41_PM.png",
+        "bg_image_mobile": "shopify://shop_images/ChatGPT_Image_May_22_2026_05_18_41_PM_719298d2-d4d1-4da0-81f4-9f0d1fd70bd3.png",
+        "hero_image_width": 340,
+        "height_desktop": 400,
+        "height_mobile": 280,
+        "show_delivery_badge": false,
+        "delivery_min": "60",
+        "delivery_max": "90",
+        "delivery_unit": "Min",
+        "delivery_label": "Delivery",
+        "show_pincode_checker": true,
+        "pincode_label": "Check if we deliver to your location",
+        "pincode_placeholder": "Enter your pincode",
+        "pincode_btn": "Check",
+        "show_usps": true
+      }
+    },
+    "stats": {
+      "type": "bz-stats-bar",
+      "blocks": {
+        "s1": {
+          "type": "stat",
+          "settings": {
+            "icon": "👷",
+            "value": "1000+",
+            "label": "Happy Customers"
+          }
+        },
+        "s2": {
+          "type": "stat",
+          "settings": {
+            "icon": "📦",
+            "value": "20+",
+            "label": "Product Categories"
+          }
+        },
+        "s3": {
+          "type": "stat",
+          "settings": {
+            "icon": "✅",
+            "value": "100%",
+            "label": "Genuine Products"
+          }
+        },
+        "s4": {
+          "type": "stat",
+          "settings": {
+            "icon": "🚚",
+            "value": "On-time",
+            "label": "Every Time"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ],
+      "settings": {
+        "bg_color": "#ffffff"
+      }
+    },
+    "categories": {
+      "type": "category-strip",
+      "blocks": {
+        "card_HhiqDe": {
+          "type": "card",
+          "settings": {
+            "collection": "cement",
+            "label": "",
+            "subtitle": "",
+            "link": "",
+            "emoji": "📦",
+            "badge": "",
+            "badge_bg": "#f5a623",
+            "badge_text": "#111111"
+          }
+        },
+        "card_9RKyCM": {
+          "type": "card",
+          "settings": {
+            "collection": "painting",
+            "label": "",
+            "subtitle": "",
+            "link": "",
+            "emoji": "📦",
+            "badge": "",
+            "badge_bg": "#f5a623",
+            "badge_text": "#111111"
+          }
+        },
+        "card_L3mVkq": {
+          "type": "card",
+          "settings": {
+            "collection": "tiling",
+            "label": "",
+            "subtitle": "",
+            "link": "",
+            "emoji": "📦",
+            "badge": "",
+            "badge_bg": "#f5a623",
+            "badge_text": "#111111"
+          }
+        }
+      },
+      "block_order": [
+        "card_HhiqDe",
+        "card_9RKyCM",
+        "card_L3mVkq"
+      ],
+      "settings": {
+        "title": "Shop by Category",
+        "title_color": "#111111",
+        "title_size": 18,
+        "title_weight": "700",
+        "title_gap": 16,
+        "view_all_url": "",
+        "viewall_text": "View all",
+        "viewall_color": "#0f6e56",
+        "viewall_size": 13,
+        "card_width": 170,
+        "img_height": 190,
+        "card_gap": 30,
+        "card_radius": 12,
+        "card_bg": "#ffffff",
+        "img_bg": "#f5f5f5",
+        "border_width": 1,
+        "border_color": "#e8e8e8",
+        "show_shadow": true,
+        "shadow_value": "0 2px 12px rgba(0,0,0,0.08)",
+        "shadow_hover": "0 8px 24px rgba(0,0,0,0.14)",
+        "hover_lift": 0,
+        "img_fit": "cover",
+        "img_zoom": 100,
+        "overlay_opacity": 0,
+        "label_position": "below",
+        "label_bg": "#ffffff",
+        "label_color": "#111111",
+        "label_size": 15,
+        "label_weight": "500",
+        "label_align": "center",
+        "label_pad_v": 10,
+        "label_pad_h": 12,
+        "show_subtitle": false,
+        "subtitle_size": 11,
+        "subtitle_color": "#888888",
+        "show_count": true,
+        "count_size": 11,
+        "count_color": "#888888",
+        "badge_size": 11,
+        "badge_radius": 6,
+        "badge_pad_v": 3,
+        "badge_pad_h": 8,
+        "badge_top": 8,
+        "badge_left": 8,
+        "section_bg": "#ffffff",
+        "pad_top": 24,
+        "pad_bottom": 24,
+        "side_pad": 24,
+        "scroll_pb": 8
+      }
+    },
+    "top_picks": {
+      "type": "product-row",
+      "settings": {
+        "collection": "",
+        "title": "Top Picks for You",
+        "eyebrow": "⭐ Best Sellers",
+        "view_all_label": "View all",
+        "show_view_all": true,
+        "product_limit": 10,
+        "bg_color": "white",
+        "card_width_override": 0,
+        "card_image_height_override": 0,
+        "accent_color": "#f5a623"
+      }
+    },
+    "offers": {
+      "type": "bz-offers",
+      "blocks": {
+        "t1": {
+          "type": "tab",
+          "settings": {
+            "id": "current",
+            "label": "Current Offers"
+          }
+        },
+        "t2": {
+          "type": "tab",
+          "settings": {
+            "id": "bulk",
+            "label": "Bulk Offers"
+          }
+        },
+        "o1": {
+          "type": "offer_card",
+          "settings": {
+            "bg_color": "#fff3d6",
+            "badge": "FLAT 4% OFF",
+            "badge_color": "#f5a623",
+            "label": "On Cement",
+            "title": "UltraTech Cement",
+            "url": ""
+          }
+        },
+        "o2": {
+          "type": "offer_card",
+          "settings": {
+            "bg_color": "#fee2e2",
+            "badge": "SAVE EXTRA",
+            "badge_color": "#ef4444",
+            "label": "Bulk Order",
+            "title": "Whatsapp Now!",
+            "url": ""
+          }
+        },
+        "o3": {
+          "type": "offer_card",
+          "settings": {
+            "bg_color": "#dcfce7",
+            "badge": "FREE DELIVERY",
+            "badge_color": "#16a34a",
+            "label": "Above ₹5000",
+            "title": "All Products",
+            "url": ""
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "o1",
+        "o2",
+        "o3"
+      ],
+      "settings": {
+        "title": "🔥 Best Offers",
+        "view_all_url": "",
+        "show_tabs": false,
+        "card_width": 220,
+        "card_height": 110
+      }
+    },
+    "products_cement": {
+      "type": "product-row",
+      "settings": {
+        "collection": "",
+        "title": "Cement",
+        "eyebrow": "🏗️ Top Brands",
+        "view_all_label": "See all",
+        "show_view_all": true,
+        "product_limit": 10,
+        "bg_color": "white",
+        "card_width_override": 0,
+        "card_image_height_override": 0,
+        "accent_color": "#f5a623"
+      }
+    },
+    "bulk_order": {
+      "type": "bz-whatsapp-order",
+      "settings": {
+        "title": "Order in Bulk?",
+        "description": "Get extra discounts for contractors & builders.",
+        "btn_label": "Request a Quote",
+        "whatsapp_number": "918729022552",
+        "whatsapp_message": "Hi! I would like to place a bulk order. Please share details.",
+        "bg_color": "#f9fbf9",
+        "full_width": false,
+        "pad_v": 32
+      }
+    },
+    "products_tmt": {
+      "type": "product-row",
+      "settings": {
+        "collection": "",
+        "title": "Steel & TMT",
+        "eyebrow": "🔩 Top Quality",
+        "view_all_label": "See all",
+        "show_view_all": true,
+        "product_limit": 10,
+        "bg_color": "white",
+        "card_width_override": 0,
+        "card_image_height_override": 0,
+        "accent_color": "#f5a623"
+      }
+    },
+    "usp_strip": {
+      "type": "bz-usp-strip",
+      "blocks": {
+        "u1": {
+          "type": "usp",
+          "settings": {
+            "icon": "🚚",
+            "title": "Super Fast Delivery",
+            "desc": "60-90 min delivery across Bathinda"
+          }
+        },
+        "u2": {
+          "type": "usp",
+          "settings": {
+            "icon": "↩️",
+            "title": "Easy Returns",
+            "desc": "Hassle-free returns"
+          }
+        },
+        "u3": {
+          "type": "usp",
+          "settings": {
+            "icon": "🔒",
+            "title": "Secure Payments",
+            "desc": "100% safe & secure"
+          }
+        },
+        "u4": {
+          "type": "usp",
+          "settings": {
+            "icon": "💬",
+            "title": "24/7 Support",
+            "desc": "We are here to help"
+          }
+        }
+      },
+      "block_order": [
+        "u1",
+        "u2",
+        "u3",
+        "u4"
+      ],
+      "settings": {
+        "bg_color": "#ffffff"
+      }
+    },
+    "faq": {
+      "type": "bz-faq",
+      "blocks": {
+        "f1": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How fast is the delivery?",
+            "answer": "<p>We deliver within 60-90 minutes across Bathinda.</p>"
+          }
+        },
+        "f2": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you deliver outside Bathinda?",
+            "answer": "<p>Currently we deliver only within Bathinda. Enter your pincode on the homepage to check serviceability.</p>"
+          }
+        },
+        "f3": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What payment methods are available?",
+            "answer": "<p>We accept Cash on Delivery (COD) and UPI payments.</p>"
+          }
+        },
+        "f4": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Can I return a product?",
+            "answer": "<p>Yes, hassle-free returns within 7 days of delivery. Contact us on WhatsApp. Returns only accepted if defective goods received.</p>"
+          }
+        },
+        "f5": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How can I place a bulk order?",
+            "answer": "<p>Click 'Request a Quote' or WhatsApp us directly for bulk and contractor pricing.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5"
+      ],
+      "settings": {
+        "title": "Frequently Asked Questions",
+        "subtitle": "",
+        "title_align": "center",
+        "max_width": 720,
+        "bg_color": "#ffffff"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "stats",
+    "categories",
+    "top_picks",
+    "offers",
+    "products_cement",
+    "bulk_order",
+    "products_tmt",
+    "usp_strip",
+    "faq"
+  ]
+}

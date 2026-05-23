@@ -1,0 +1,57 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "col1": {
+          "type": "link_column",
+          "settings": {
+            "heading": "Company",
+            "menu": "footer"
+          }
+        },
+        "col2": {
+          "type": "link_column",
+          "settings": {
+            "heading": "Help",
+            "menu": "footer"
+          }
+        },
+        "col3": {
+          "type": "link_column",
+          "settings": {
+            "heading": "Legal",
+            "menu": "footer"
+          }
+        }
+      },
+      "block_order": [
+        "col1",
+        "col2",
+        "col3"
+      ],
+      "settings": {
+        "show_usps": true,
+        "tagline": "Delivering Construction Materials in Minutes",
+        "show_social": true,
+        "instagram": "",
+        "facebook": "",
+        "twitter": ""
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

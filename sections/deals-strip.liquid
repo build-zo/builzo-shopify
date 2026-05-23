@@ -1,0 +1,171 @@
+{% comment %}
+  FILE: sections/deals-strip.liquid
+  Blinkit-style horizontal scrollable deals/offer card strip
+{% endcomment %}
+
+{%- assign dw = section.settings.card_width  | default: 200 -%}
+{%- assign dh = section.settings.card_height | default: 100 -%}
+
+<style>
+  #deals-{{ section.id }} .qc-deals__card { width: {{ dw }}px; height: {{ dh }}px; }
+</style>
+
+<section class="qc-deals" id="deals-{{ section.id }}" data-section-id="{{ section.id }}">
+  <div class="qc-deals__inner" style="padding: var(--qc-section-pad-v, 20px) 0;">
+    <div class="qc-section-header" style="padding: 0 var(--qc-section-pad-h, 20px);">
+      {%- if section.settings.title != blank -%}
+        <h2 class="qc-section-title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.view_all_url != blank -%}
+        <a href="{{ section.settings.view_all_url }}" class="qc-view-all">View all</a>
+      {%- endif -%}
+    </div>
+
+    <div class="qc-deals__scroll-wrap" style="padding: 4px var(--qc-section-pad-h, 20px) 8px;">
+      <div class="qc-deals__track">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'deal' -%}
+            <a
+              href="{{ block.settings.url | default: '#' }}"
+              class="qc-deals__card"
+              style="background: {{ block.settings.bg_color }};"
+              {{ block.shopify_attributes }}
+            >
+              {%- if block.settings.badge != blank -%}
+                <span class="qc-deals__badge" style="background: {{ block.settings.badge_color }}; color: #fff;">
+                  {{ block.settings.badge }}
+                </span>
+              {%- endif -%}
+              {%- if block.settings.image != blank -%}
+                <picture>
+                  {%- if block.settings.image_mobile != blank -%}
+                    <source media="(max-width: 768px)" srcset="{{ block.settings.image_mobile | image_url: width: 400 }}" />
+                  {%- endif -%}
+                  <img
+                    src="{{ block.settings.image | image_url: width: 400 }}"
+                    alt="{{ block.settings.title | escape }}"
+                    width="{{ dw }}"
+                    height="{{ dh }}"
+                    loading="lazy"
+                    class="qc-deals__card-img"
+                  />
+                </picture>
+              {%- else -%}
+                <div class="qc-deals__card-content">
+                  <p class="qc-deals__card-label">{{ block.settings.label }}</p>
+                  <p class="qc-deals__card-title">{{ block.settings.title }}</p>
+                </div>
+              {%- endif -%}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Deals Strip",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section title",
+      "default": "🔥 Deals of the Day"
+    },
+    {
+      "type": "url",
+      "id": "view_all_url",
+      "label": "View all link"
+    },
+    {
+      "type": "header",
+      "content": "Card Size"
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "label": "Card width",
+      "min": 140, "max": 320, "step": 10, "default": 200,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_height",
+      "label": "Card height",
+      "min": 80, "max": 200, "step": 10, "default": 100,
+      "unit": "px"
+    }
+  ],
+  "blocks": [
+    { "type": "@app" },
+    {
+      "type": "deal",
+      "name": "Deal Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Deal banner image — desktop",
+          "info": "Recommended: 400×200px"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Deal banner image — mobile",
+          "info": "Optional. Shown on mobile screens."
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background color",
+          "default": "#fef9c3"
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge text",
+          "default": "40% OFF"
+        },
+        {
+          "type": "color",
+          "id": "badge_color",
+          "label": "Badge color",
+          "default": "#dc2626"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Deal label",
+          "default": "Limited Time"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Deal title",
+          "default": "Fresh Mangoes"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Deals Strip",
+      "blocks": [
+        { "type": "deal", "settings": { "bg_color": "#fef9c3", "badge": "40% OFF", "badge_color": "#dc2626", "label": "Fresh & Juicy", "title": "Alphonso Mangoes" } },
+        { "type": "deal", "settings": { "bg_color": "#dcfce7", "badge": "BUY 2 GET 1", "badge_color": "#16a34a", "label": "Daily Essential", "title": "Full Cream Milk" } },
+        { "type": "deal", "settings": { "bg_color": "#fce7f3", "badge": "30% OFF", "badge_color": "#db2777", "label": "Bestseller", "title": "Greek Yogurt" } },
+        { "type": "deal", "settings": { "bg_color": "#e0f2fe", "badge": "COMBO DEAL", "badge_color": "#0284c7", "label": "Value Pack", "title": "Cold Drinks Bundle" } },
+        { "type": "deal", "settings": { "bg_color": "#ffedd5", "badge": "50% OFF", "badge_color": "#ea580c", "label": "Snack Time", "title": "Premium Nuts Mix" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,492 @@
+{% doc %}
+  @prompt
+    I want a home page section with a background image and overlay of white color as a gradient towards right and on left side i want to give a cityname with text highlighted with curved border whith highlight colour in yellow, below it i want to add a heading "Fastet Delivery of Construction Materials".
+    
+    Then 4 USP icons along with customizable text and custom icons
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-hero-section-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    min-height: {{ block.settings.section_height }}px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .ai-hero-background-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .ai-hero-background-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-hero-background-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-hero-background-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 500px;
+    max-height: 500px;
+  }
+
+  .ai-hero-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, 
+      {{ block.settings.overlay_color }} 0%, 
+      {{ block.settings.overlay_color | color_modify: 'alpha', 0.8 }} 40%,
+      {{ block.settings.overlay_color | color_modify: 'alpha', 0.4 }} 70%,
+      transparent 100%
+    );
+    z-index: 2;
+  }
+
+  .ai-hero-content-{{ ai_gen_id }} {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: {{ block.settings.content_max_width }}px;
+    padding: 40px 20px;
+    margin-left: {{ block.settings.content_margin_left }}px;
+  }
+
+  .ai-hero-city-{{ ai_gen_id }} {
+    display: inline-block;
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .ai-hero-city-text-{{ ai_gen_id }} {
+    position: relative;
+    z-index: 2;
+    font-size: {{ block.settings.city_font_size }}px;
+    font-weight: 600;
+    color: {{ block.settings.city_text_color }};
+    padding: 8px 16px;
+  }
+
+  .ai-hero-city-highlight-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% + 20px);
+    height: calc(100% + 10px);
+    background-color: {{ block.settings.highlight_color }};
+    border-radius: 50% 30% 50% 30%;
+    z-index: 1;
+  }
+
+  .ai-hero-heading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.heading_font_size }}px;
+    font-weight: 700;
+    color: {{ block.settings.heading_color }};
+    margin: 0 0 40px 0;
+    line-height: 1.2;
+  }
+
+  .ai-hero-usps-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+  }
+
+  .ai-hero-usp-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .ai-hero-usp-icon-{{ ai_gen_id }} {
+    width: {{ block.settings.icon_size }}px;
+    height: {{ block.settings.icon_size }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: {{ block.settings.icon_background_color }};
+    border-radius: 50%;
+    padding: 15px;
+  }
+
+  .ai-hero-usp-icon-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .ai-hero-usp-icon-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-hero-usp-icon-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+  }
+
+  .ai-hero-usp-text-{{ ai_gen_id }} {
+    font-size: {{ block.settings.usp_font_size }}px;
+    color: {{ block.settings.usp_text_color }};
+    font-weight: 500;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-hero-section-{{ ai_gen_id }} {
+      min-height: {{ block.settings.section_height | times: 0.7 }}px;
+    }
+
+    .ai-hero-content-{{ ai_gen_id }} {
+      margin-left: 0;
+      padding: 30px 15px;
+    }
+
+    .ai-hero-city-text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.city_font_size | times: 0.8 }}px;
+    }
+
+    .ai-hero-heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.heading_font_size | times: 0.7 }}px;
+    }
+
+    .ai-hero-usps-{{ ai_gen_id }} {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .ai-hero-usp-icon-{{ ai_gen_id }} {
+      width: {{ block.settings.icon_size | times: 0.8 }}px;
+      height: {{ block.settings.icon_size | times: 0.8 }}px;
+    }
+
+    .ai-hero-usp-text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.usp_font_size | times: 0.9 }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-hero-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-hero-background-{{ ai_gen_id }}">
+    {% if block.settings.background_image %}
+      <img
+        src="{{ block.settings.background_image | image_url: width: 2000 }}"
+        alt="{{ block.settings.background_image.alt | escape }}"
+        loading="lazy"
+        width="{{ block.settings.background_image.width }}"
+        height="{{ block.settings.background_image.height }}"
+      >
+    {% else %}
+      <div class="ai-hero-background-placeholder-{{ ai_gen_id }}">
+        {{ 'hero-apparel-1' | placeholder_svg_tag }}
+        <div class="ai-hero-empty-state-{{ ai_gen_id }}">
+          Add a background image to get started
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="ai-hero-overlay-{{ ai_gen_id }}"></div>
+
+  <div class="ai-hero-content-{{ ai_gen_id }}">
+    {% if block.settings.city_name != blank %}
+      <div class="ai-hero-city-{{ ai_gen_id }}">
+        <div class="ai-hero-city-highlight-{{ ai_gen_id }}"></div>
+        <div class="ai-hero-city-text-{{ ai_gen_id }}">{{ block.settings.city_name }}</div>
+      </div>
+    {% endif %}
+
+    {% if block.settings.heading != blank %}
+      <h1 class="ai-hero-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h1>
+    {% endif %}
+
+    <div class="ai-hero-usps-{{ ai_gen_id }}">
+      {% for i in (1..4) %}
+        {% liquid
+          assign icon_key = 'usp_' | append: i | append: '_icon'
+          assign text_key = 'usp_' | append: i | append: '_text'
+          assign icon = block.settings[icon_key]
+          assign text = block.settings[text_key]
+        %}
+
+        {% if text != blank %}
+          <div class="ai-hero-usp-{{ ai_gen_id }}">
+            <div class="ai-hero-usp-icon-{{ ai_gen_id }}">
+              {% if icon %}
+                <img
+                  src="{{ icon | image_url: width: 100 }}"
+                  alt="{{ text | escape }}"
+                  loading="lazy"
+                  width="100"
+                  height="100"
+                >
+              {% else %}
+                <div class="ai-hero-usp-icon-placeholder-{{ ai_gen_id }}">
+                  {{ 'image' | placeholder_svg_tag }}
+                </div>
+              {% endif %}
+            </div>
+            <div class="ai-hero-usp-text-{{ ai_gen_id }}">{{ text }}</div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hero with USPs",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "min": 400,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "label": "Section height",
+      "default": 600
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 400,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "label": "Content max width",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "content_margin_left",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "Content left margin",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "City name"
+    },
+    {
+      "type": "text",
+      "id": "city_name",
+      "label": "City name",
+      "default": "Mumbai"
+    },
+    {
+      "type": "range",
+      "id": "city_font_size",
+      "min": 14,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Font size",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "city_text_color",
+      "label": "Text color",
+      "default": "#0e1b4d"
+    },
+    {
+      "type": "color",
+      "id": "highlight_color",
+      "label": "Highlight color",
+      "default": "#FFD700"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Fastest Delivery of Construction Materials"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "min": 24,
+      "max": 72,
+      "step": 4,
+      "unit": "px",
+      "label": "Font size",
+      "default": 48
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Text color",
+      "default": "#0e1b4d"
+    },
+    {
+      "type": "header",
+      "content": "USP 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "usp_1_icon",
+      "label": "Icon"
+    },
+    {
+      "type": "text",
+      "id": "usp_1_text",
+      "label": "Text",
+      "default": "Same Day Delivery"
+    },
+    {
+      "type": "header",
+      "content": "USP 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "usp_2_icon",
+      "label": "Icon"
+    },
+    {
+      "type": "text",
+      "id": "usp_2_text",
+      "label": "Text",
+      "default": "Quality Assured"
+    },
+    {
+      "type": "header",
+      "content": "USP 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "usp_3_icon",
+      "label": "Icon"
+    },
+    {
+      "type": "text",
+      "id": "usp_3_text",
+      "label": "Text",
+      "default": "Best Prices"
+    },
+    {
+      "type": "header",
+      "content": "USP 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "usp_4_icon",
+      "label": "Icon"
+    },
+    {
+      "type": "text",
+      "id": "usp_4_text",
+      "label": "Text",
+      "default": "Expert Support"
+    },
+    {
+      "type": "header",
+      "content": "USP style"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 40,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "Icon size",
+      "default": 60
+    },
+    {
+      "type": "color",
+      "id": "icon_background_color",
+      "label": "Icon background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "usp_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Text size",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "usp_text_color",
+      "label": "Text color",
+      "default": "#0e1b4d"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero with USPs"
+    }
+  ]
+}
+{% endschema %}

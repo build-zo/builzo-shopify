@@ -1,0 +1,1048 @@
+{% comment %}
+  FILE: sections/collection-template.liquid
+  Full collection page — filters sidebar, sort, discount badge, assured badge,
+  variant dropdowns, qty + add to cart, fully customizable
+{% endcomment %}
+
+{%- liquid
+  assign accent            = section.settings.accent_color         | default: '#0f6e56'
+  assign card_bg           = section.settings.card_bg              | default: '#ffffff'
+  assign card_border       = section.settings.card_border          | default: '#ebebeb'
+  assign card_radius       = section.settings.card_radius          | default: 12
+  assign img_bg            = section.settings.img_bg               | default: '#f9f9f9'
+  assign img_height        = section.settings.img_height           | default: 220
+  assign title_size        = section.settings.title_size           | default: 14
+  assign title_color       = section.settings.title_color          | default: '#111111'
+  assign price_size        = section.settings.price_size           | default: 16
+  assign price_color       = section.settings.price_color          | default: '#111111'
+  assign compare_color     = section.settings.compare_color        | default: '#999999'
+  assign btn_bg            = section.settings.btn_bg               | default: accent
+  assign btn_text          = section.settings.btn_text_color       | default: '#ffffff'
+  assign btn_label         = section.settings.btn_label            | default: 'ADD'
+  assign show_assured      = section.settings.show_assured
+  assign assured_text      = section.settings.assured_text         | default: 'ASSURED'
+  assign assured_bg        = section.settings.assured_bg           | default: '#F5A623'
+  assign assured_color     = section.settings.assured_text_color   | default: '#111111'
+  assign show_return       = section.settings.show_return_badge
+  assign return_text       = section.settings.return_badge_text    | default: '7 Day Replacement'
+  assign return_bg         = section.settings.return_badge_bg      | default: '#FFF3D6'
+  assign return_color      = section.settings.return_badge_color   | default: '#D97706'
+  assign show_bulk         = section.settings.show_bulk_link
+  assign bulk_text         = section.settings.bulk_link_text       | default: 'Unlock Bulk Prices'
+  assign bulk_url          = section.settings.bulk_link_url
+  assign show_discount_badge = section.settings.show_discount_badge
+  assign disc_bg           = section.settings.discount_badge_bg    | default: '#EF4444'
+  assign disc_color        = section.settings.discount_badge_color | default: '#ffffff'
+  assign cols_desktop      = section.settings.cols_desktop         | default: 4
+  assign cols_mobile       = section.settings.cols_mobile          | default: 2
+  assign products_per_page = section.settings.products_per_page    | default: 24
+  assign show_filter       = section.settings.show_filter
+  assign show_sort         = section.settings.show_sort
+  assign filter_position   = section.settings.filter_position      | default: 'sidebar'
+  assign label_color       = section.settings.label_color          | default: '#666666'
+-%}
+
+{%- comment -%} Active filters {%- endcomment -%}
+{%- assign active_filters = false -%}
+{%- for filter in collection.filters -%}
+  {%- for value in filter.active_values -%}
+    {%- assign active_filters = true -%}
+  {%- endfor -%}
+  {%- if filter.min_value.value or filter.max_value.value -%}
+    {%- assign active_filters = true -%}
+  {%- endif -%}
+{%- endfor -%}
+
+<style>
+#bzCol-{{ section.id }} {
+  background: {{ section.settings.section_bg | default: '#f5f5f5' }};
+  padding: {{ section.settings.pad_v | default: 20 }}px 0;
+}
+#bzCol-{{ section.id }} .bzc-inner {
+  max-width: var(--qc-max-width, 1280px);
+  margin: 0 auto;
+  padding: 0 {{ section.settings.pad_h | default: 20 }}px;
+}
+
+/* ── Toolbar ── */
+#bzCol-{{ section.id }} .bzc-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: {{ section.settings.toolbar_bg | default: '#ffffff' }};
+  border-radius: {{ section.settings.toolbar_radius | default: 10 }}px;
+  border: 1px solid {{ card_border }};
+}
+#bzCol-{{ section.id }} .bzc-count {
+  font-size: {{ section.settings.toolbar_font_size | default: 13 }}px;
+  color: {{ label_color }};
+  font-weight: 500;
+}
+#bzCol-{{ section.id }} .bzc-sort-select {
+  border: 1px solid {{ card_border }};
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: {{ section.settings.toolbar_font_size | default: 13 }}px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  color: {{ title_color }};
+  background: {{ section.settings.toolbar_bg | default: '#ffffff' }};
+}
+#bzCol-{{ section.id }} .bzc-filter-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border: 1px solid {{ card_border }};
+  border-radius: 8px;
+  background: {{ section.settings.toolbar_bg | default: '#ffffff' }};
+  font-size: {{ section.settings.toolbar_font_size | default: 13 }}px;
+  font-weight: 600;
+  color: {{ title_color }};
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+#bzCol-{{ section.id }} .bzc-filter-toggle-btn:hover { border-color: {{ accent }}; color: {{ accent }}; }
+
+/* ── Layout: sidebar + grid ── */
+#bzCol-{{ section.id }} .bzc-layout {
+  display: grid;
+  grid-template-columns: {{ section.settings.filter_width | default: 240 }}px 1fr;
+  gap: {{ section.settings.filter_gap | default: 20 }}px;
+  align-items: flex-start;
+}
+#bzCol-{{ section.id }} .bzc-layout.no-sidebar {
+  grid-template-columns: 1fr;
+}
+
+/* ── Filter Sidebar ── */
+#bzCol-{{ section.id }} .bzc-sidebar {
+  background: {{ section.settings.filter_bg | default: '#ffffff' }};
+  border: 1px solid {{ card_border }};
+  border-radius: {{ section.settings.filter_radius | default: 12 }}px;
+  overflow: hidden;
+  position: sticky;
+  top: 90px;
+}
+#bzCol-{{ section.id }} .bzc-sidebar-head {
+  padding: 14px 16px;
+  border-bottom: 1px solid {{ card_border }};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#bzCol-{{ section.id }} .bzc-sidebar-title {
+  font-size: {{ section.settings.filter_title_size | default: 14 }}px;
+  font-weight: 700;
+  color: {{ section.settings.filter_title_color | default: '#111111' }};
+  margin: 0;
+}
+#bzCol-{{ section.id }} .bzc-clear-all {
+  font-size: 12px;
+  color: {{ accent }};
+  text-decoration: underline;
+  cursor: pointer;
+}
+#bzCol-{{ section.id }} .bzc-filter-group {
+  border-bottom: 1px solid {{ card_border }};
+}
+#bzCol-{{ section.id }} .bzc-filter-group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  font-size: {{ section.settings.filter_group_size | default: 13 }}px;
+  font-weight: 600;
+  color: {{ section.settings.filter_title_color | default: '#111111' }};
+  cursor: pointer;
+  user-select: none;
+  background: none;
+  border: none;
+  width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+#bzCol-{{ section.id }} .bzc-filter-group-title:hover { color: {{ accent }}; }
+#bzCol-{{ section.id }} .bzc-filter-body {
+  padding: 0 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#bzCol-{{ section.id }} .bzc-filter-body.hidden { display: none; }
+#bzCol-{{ section.id }} .bzc-filter-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: {{ section.settings.filter_item_size | default: 13 }}px;
+  color: {{ section.settings.filter_item_color | default: '#333333' }};
+  cursor: pointer;
+  padding: 3px 0;
+  transition: color 0.1s;
+}
+#bzCol-{{ section.id }} .bzc-filter-label:hover { color: {{ accent }}; }
+#bzCol-{{ section.id }} .bzc-filter-cb {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid {{ card_border }};
+  flex-shrink: 0;
+  accent-color: {{ accent }};
+  cursor: pointer;
+}
+#bzCol-{{ section.id }} .bzc-filter-count {
+  font-size: 11px;
+  color: {{ label_color }};
+  margin-left: auto;
+}
+
+/* Active filter pills */
+#bzCol-{{ section.id }} .bzc-active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+#bzCol-{{ section.id }} .bzc-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: {{ accent }}1a;
+  color: {{ accent }};
+  border: 1px solid {{ accent }}33;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+#bzCol-{{ section.id }} .bzc-filter-pill svg { flex-shrink: 0; }
+
+/* ── Grid ── */
+#bzCol-{{ section.id }} .bzc-grid {
+  display: grid;
+  grid-template-columns: repeat({{ cols_desktop }}, 1fr);
+  gap: {{ section.settings.card_gap | default: 16 }}px;
+}
+
+/* ── Card ── */
+#bzCol-{{ section.id }} .bzc-card {
+  background: {{ card_bg }};
+  border: 1px solid {{ card_border }};
+  border-radius: {{ card_radius }}px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+#bzCol-{{ section.id }} .bzc-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  transform: translateY(-2px);
+}
+#bzCol-{{ section.id }} .bzc-img-wrap {
+  height: {{ img_height }}px;
+  background: {{ img_bg }};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+#bzCol-{{ section.id }} .bzc-img {
+  width: 100%;
+  height: 100%;
+  object-fit: {{ section.settings.img_fit | default: 'contain' }};
+  padding: {{ section.settings.img_padding | default: 12 }}px;
+  transition: transform 0.2s;
+}
+#bzCol-{{ section.id }} .bzc-card:hover .bzc-img { transform: scale(1.04); }
+#bzCol-{{ section.id }} .bzc-body {
+  padding: {{ section.settings.body_pad | default: 12 }}px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 6px;
+}
+#bzCol-{{ section.id }} .bzc-off-badge {
+  position: absolute;
+  top: {{ section.settings.disc_badge_top | default: 8 }}px;
+  left: {{ section.settings.disc_badge_left | default: 8 }}px;
+  background: {{ disc_bg }};
+  color: {{ disc_color }};
+  font-size: {{ section.settings.discount_badge_size | default: 11 }}px;
+  font-weight: 700;
+  padding: {{ section.settings.disc_badge_pad_v | default: 3 }}px {{ section.settings.disc_badge_pad_h | default: 8 }}px;
+  border-radius: {{ section.settings.discount_badge_radius | default: 5 }}px;
+  z-index: 2;
+  letter-spacing: 0.02em;
+}
+#bzCol-{{ section.id }} .bzc-assured {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: {{ assured_bg }};
+  color: {{ assured_color }};
+  font-size: {{ section.settings.assured_size | default: 10 }}px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: {{ section.settings.assured_radius | default: 5 }}px;
+  letter-spacing: 0.04em;
+  width: fit-content;
+}
+#bzCol-{{ section.id }} .bzc-title {
+  font-size: {{ title_size }}px;
+  color: {{ title_color }};
+  font-weight: {{ section.settings.title_weight | default: '500' }};
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: {{ section.settings.title_lines | default: 2 }};
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-decoration: none;
+}
+#bzCol-{{ section.id }} .bzc-title:hover { color: {{ accent }}; }
+#bzCol-{{ section.id }} .bzc-price { font-size: {{ price_size }}px; font-weight: 700; color: {{ price_color }}; }
+#bzCol-{{ section.id }} .bzc-compare { font-size: calc({{ price_size }}px - 3px); color: {{ compare_color }}; text-decoration: line-through; }
+#bzCol-{{ section.id }} .bzc-return {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: {{ return_bg }};
+  color: {{ return_color }};
+  font-size: {{ section.settings.return_size | default: 11 }}px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 999px;
+  width: fit-content;
+}
+#bzCol-{{ section.id }} .bzc-bulk-link {
+  color: {{ accent }};
+  font-size: {{ section.settings.bulk_size | default: 12 }}px;
+  font-weight: 600;
+  text-decoration: underline;
+}
+#bzCol-{{ section.id }} .bzc-variant-label {
+  font-size: {{ section.settings.variant_label_size | default: 11 }}px;
+  font-weight: 600;
+  color: {{ accent }};
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+#bzCol-{{ section.id }} .bzc-variant-select {
+  width: 100%;
+  border: 1.5px solid {{ section.settings.variant_border | default: '#D1D5DB' }};
+  border-radius: {{ section.settings.variant_radius | default: 8 }}px;
+  padding: 7px 28px 7px 10px;
+  font-size: {{ section.settings.variant_font_size | default: 12 }}px;
+  color: {{ section.settings.variant_text_color | default: '#111111' }};
+  background: {{ section.settings.variant_bg | default: '#ffffff' }} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 10px center;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+#bzCol-{{ section.id }} .bzc-variant-select:focus { border-color: {{ accent }}; }
+#bzCol-{{ section.id }} .bzc-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+#bzCol-{{ section.id }} .bzc-qty {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid {{ section.settings.qty_border | default: '#D1D5DB' }};
+  border-radius: {{ section.settings.btn_radius | default: 8 }}px;
+  overflow: hidden;
+  flex-shrink: 0;
+  height: {{ section.settings.btn_height | default: 40 }}px;
+}
+#bzCol-{{ section.id }} .bzc-qty-btn {
+  width: {{ section.settings.btn_height | default: 40 }}px;
+  height: 100%;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  font-family: inherit;
+  color: {{ section.settings.qty_text_color | default: '#111111' }};
+  transition: background 0.1s;
+}
+#bzCol-{{ section.id }} .bzc-qty-btn:hover { background: {{ accent }}1a; }
+#bzCol-{{ section.id }} .bzc-qty-val {
+  min-width: 28px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: {{ section.settings.qty_text_color | default: '#111111' }};
+}
+#bzCol-{{ section.id }} .bzc-add-btn {
+  flex: 1;
+  height: {{ section.settings.btn_height | default: 40 }}px;
+  background: {{ btn_bg }};
+  color: {{ btn_text }};
+  border: none;
+  border-radius: {{ section.settings.btn_radius | default: 8 }}px;
+  font-size: {{ section.settings.btn_size | default: 14 }}px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+  letter-spacing: 0.04em;
+}
+#bzCol-{{ section.id }} .bzc-add-btn:hover { opacity: 0.88; }
+#bzCol-{{ section.id }} .bzc-add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  #bzCol-{{ section.id }} .bzc-layout { grid-template-columns: 1fr !important; }
+  #bzCol-{{ section.id }} .bzc-sidebar { position: static; display: none; }
+  #bzCol-{{ section.id }} .bzc-sidebar.open { display: block; }
+}
+@media (max-width: 768px) {
+  #bzCol-{{ section.id }} .bzc-grid { grid-template-columns: repeat({{ cols_mobile }}, 1fr); gap: {{ section.settings.card_gap_mobile | default: 10 }}px; }
+  #bzCol-{{ section.id }} .bzc-img-wrap { height: {{ section.settings.img_height_mobile | default: 150 }}px; }
+}
+</style>
+
+<section id="bzCol-{{ section.id }}" data-section-id="{{ section.id }}">
+  <div class="bzc-inner">
+
+
+    <!-- Breadcrumb -->
+    {%- if section.settings.show_breadcrumb -%}
+      <nav style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:{{ section.settings.breadcrumb_size | default: 12 }}px;color:{{ section.settings.breadcrumb_color | default: '#888888' }};margin-bottom:12px;">
+        <a href="{{ routes.root_url }}" style="color:{{ section.settings.breadcrumb_color | default: '#888888' }};text-decoration:none;" onmouseenter="this.style.color='{{ accent }}'" onmouseleave="this.style.color='{{ section.settings.breadcrumb_color | default: '#888888' }}'">
+          {{ section.settings.breadcrumb_home | default: 'Home' }}
+        </a>
+        <span style="opacity:0.5;">{{ section.settings.breadcrumb_sep | default: '›' }}</span>
+        <span style="color:{{ section.settings.breadcrumb_active_color | default: '#111111' }};font-weight:{{ section.settings.breadcrumb_active_weight | default: '500' }};">{{ collection.title }}</span>
+      </nav>
+    {%- endif -%}
+
+    <!-- Collection heading -->
+    <div style="margin-bottom:14px;">
+      <h1 style="font-size:{{ section.settings.heading_size | default: 22 }}px;font-weight:700;color:{{ section.settings.heading_color | default: '#111111' }};margin:0 0 4px;">
+        {{ collection.title }}
+      </h1>
+      {%- if collection.description != blank -%}
+        <p style="font-size:13px;color:{{ label_color }};margin:0;">{{ collection.description }}</p>
+      {%- endif -%}
+    </div>
+
+    <!-- Extra blocks (banner, text) -->
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'banner' -%}
+        <div style="margin-bottom:14px;border-radius:{{ card_radius }}px;overflow:hidden;" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 1400 }}" alt="{{ block.settings.text | escape }}" width="1400" height="160" loading="lazy" style="width:100%;height:auto;display:block;" />
+          {%- elsif block.settings.text != blank -%}
+            <div style="background:{{ block.settings.bg | default: assured_bg }};padding:14px 20px;font-weight:600;font-size:14px;color:{{ block.settings.text_color | default: '#111111' }};">{{ block.settings.text }}</div>
+          {%- endif -%}
+        </div>
+      {%- elsif block.type == 'custom_text' -%}
+        <div style="margin-bottom:14px;font-size:13px;color:{{ label_color }};" {{ block.shopify_attributes }}>{{ block.settings.content }}</div>
+      {%- elsif block.type == '@app' -%}
+        {% render block %}
+      {%- endif -%}
+    {%- endfor -%}
+
+    <!-- Active filter pills -->
+    {%- if active_filters -%}
+      <div class="bzc-active-filters">
+        {%- for filter in collection.filters -%}
+          {%- for value in filter.active_values -%}
+            <a href="{{ value.url_to_remove }}" class="bzc-filter-pill">
+              {{ filter.label }}: {{ value.label }}
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </a>
+          {%- endfor -%}
+        {%- endfor -%}
+        <a href="{{ collection.url }}" class="bzc-filter-pill" style="background:#fee2e2;color:#dc2626;border-color:#fca5a5;">
+          Clear all ×
+        </a>
+      </div>
+    {%- endif -%}
+
+    <!-- Toolbar -->
+    <div class="bzc-toolbar">
+      <div style="display:flex;align-items:center;gap:10px;">
+        {%- if show_filter and collection.filters.size > 0 -%}
+          <button type="button" class="bzc-filter-toggle-btn" id="bzFilterToggle">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            {{ section.settings.filter_btn_text | default: 'Filter' }}
+            {%- if active_filters -%}
+              <span style="background:{{ accent }};color:#fff;border-radius:999px;width:18px;height:18px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;" id="bzFilterCount"></span>
+            {%- endif -%}
+          </button>
+        {%- endif -%}
+        <p class="bzc-count">
+          {{ collection.products_count }} {{ section.settings.products_label | default: 'products' }}
+        </p>
+      </div>
+      {%- if show_sort -%}
+        <select class="bzc-sort-select" id="bzColSort" aria-label="Sort by" onchange="window.location=this.value">
+          {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+          {%- for option in collection.sort_options -%}
+            <option value="{{ collection.url }}?sort_by={{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      {%- endif -%}
+    </div>
+
+    <!-- Layout: sidebar + grid -->
+    {%- paginate collection.products by products_per_page -%}
+
+    <div class="bzc-layout{% unless show_filter and collection.filters.size > 0 %} no-sidebar{% endunless %}" id="bzColLayout">
+
+      <!-- ── FILTER SIDEBAR ── -->
+      {%- if show_filter and collection.filters.size > 0 -%}
+        <aside class="bzc-sidebar" id="bzFilterSidebar">
+          <div class="bzc-sidebar-head">
+            <p class="bzc-sidebar-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              {{ section.settings.filter_heading | default: 'Filters' }}
+            </p>
+            {%- if active_filters -%}
+              <a href="{{ collection.url }}" class="bzc-clear-all">Clear all</a>
+            {%- endif -%}
+          </div>
+
+          <form id="bzFilterForm" action="{{ collection.url }}" method="get">
+
+            {%- comment -%} Preserve existing sort_by if set {%- endcomment -%}
+            {%- if collection.sort_by != blank -%}
+              <input type="hidden" name="sort_by" value="{{ collection.sort_by }}" />
+            {%- endif -%}
+
+            {%- for filter in collection.filters -%}
+              <div class="bzc-filter-group">
+                <button
+                  type="button"
+                  class="bzc-filter-group-title"
+                  data-filter-toggle="{{ forloop.index }}"
+                  aria-expanded="true"
+                >
+                  {{ filter.label }}
+                  <svg class="bzc-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+
+                <div class="bzc-filter-body" data-filter-body="{{ forloop.index }}">
+                  {%- if filter.type == 'list' -%}
+                    {%- for value in filter.values -%}
+                      <label class="bzc-filter-label">
+                        <input
+                          type="checkbox"
+                          class="bzc-filter-cb"
+                          name="{{ value.param_name }}"
+                          value="{{ value.value }}"
+                          {% if value.active %}checked{% endif %}
+                          {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                        />
+                        {{ value.label }}
+                        <span class="bzc-filter-count">({{ value.count }})</span>
+                      </label>
+                    {%- endfor -%}
+
+                  {%- elsif filter.type == 'price_range' -%}
+                    <div style="display:flex;gap:8px;align-items:center;">
+                      <div style="flex:1;">
+                        <label style="font-size:11px;color:{{ label_color }};display:block;margin-bottom:3px;">Min (₹)</label>
+                        <input
+                          type="number"
+                          name="{{ filter.min_value.param_name }}"
+                          id="bzFilterPriceMin"
+                          value="{{ filter.min_value.value | divided_by: 100 }}"
+                          placeholder="{{ filter.range_min | divided_by: 100 }}"
+                          min="{{ filter.range_min | divided_by: 100 }}"
+                          max="{{ filter.range_max | divided_by: 100 }}"
+                          style="width:100%;border:1.5px solid {{ card_border }};border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;outline:none;"
+                          onfocus="this.style.borderColor='{{ accent }}'"
+                          onblur="this.style.borderColor='{{ card_border }}'"
+                        />
+                      </div>
+                      <span style="color:{{ label_color }};margin-top:16px;">–</span>
+                      <div style="flex:1;">
+                        <label style="font-size:11px;color:{{ label_color }};display:block;margin-bottom:3px;">Max (₹)</label>
+                        <input
+                          type="number"
+                          name="{{ filter.max_value.param_name }}"
+                          id="bzFilterPriceMax"
+                          value="{{ filter.max_value.value | divided_by: 100 }}"
+                          placeholder="{{ filter.range_max | divided_by: 100 }}"
+                          min="{{ filter.range_min | divided_by: 100 }}"
+                          max="{{ filter.range_max | divided_by: 100 }}"
+                          style="width:100%;border:1.5px solid {{ card_border }};border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;outline:none;"
+                          onfocus="this.style.borderColor='{{ accent }}'"
+                          onblur="this.style.borderColor='{{ card_border }}'"
+                        />
+                      </div>
+                    </div>
+                  {%- endif -%}
+                </div>
+              </div>
+            {%- endfor -%}
+
+            <div style="padding:14px 16px;">
+              <button
+                type="submit"
+                style="width:100%;background:{{ accent }};color:#fff;border:none;border-radius:{{ section.settings.btn_radius | default: 8 }}px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;"
+              >
+                {{ section.settings.filter_apply_text | default: 'Apply Filters' }}
+              </button>
+            </div>
+
+          </form>
+        </aside>
+      {%- endif -%}
+
+      <!-- ── PRODUCT GRID ── -->
+      <div>
+        {%- if collection.products_count > 0 -%}
+          <div class="bzc-grid">
+            {%- for product in collection.products -%}
+              {%- assign fv = product.selected_or_first_available_variant -%}
+              {%- assign has_compare = false -%}
+              {%- if fv.compare_at_price > fv.price -%}
+                {%- assign has_compare = true -%}
+                {%- assign disc_pct = fv.compare_at_price | minus: fv.price | times: 100 | divided_by: fv.compare_at_price -%}
+              {%- endif -%}
+
+              <div class="bzc-card" data-product-id="{{ product.id }}" data-product-handle="{{ product.handle }}">
+
+                <!-- Image -->
+                <a href="{{ product.url }}" class="bzc-img-wrap" tabindex="-1" aria-hidden="true">
+                  {%- if show_discount_badge and has_compare -%}
+                    <span class="bzc-off-badge">{{ disc_pct }}% OFF</span>
+                  {%- endif -%}
+                  {%- if product.featured_image -%}
+                    <img class="bzc-img" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.featured_image.alt | escape }}" width="300" height="{{ img_height }}" loading="lazy" />
+                  {%- else -%}
+                    <span style="font-size:48px;">📦</span>
+                  {%- endif -%}
+                </a>
+
+                <!-- Body -->
+                <div class="bzc-body">
+
+                  {%- if show_assured -%}
+                    <span class="bzc-assured">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="{{ assured_color }}"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                      {{ assured_text }}
+                    </span>
+                  {%- endif -%}
+
+                  <a href="{{ product.url }}" class="bzc-title">{{ product.title }}</a>
+
+                  <!-- Price -->
+                  <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+                    {%- if has_compare -%}
+                      <s class="bzc-compare" data-compare-price>₹{{ fv.compare_at_price | money_without_currency }}</s>
+                    {%- endif -%}
+                    <span class="bzc-price" data-price>₹{{ fv.price | money_without_currency }}</span>
+                  </div>
+
+                  {%- if show_return -%}
+                    <span class="bzc-return">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="{{ return_color }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.1"/></svg>
+                      {{ return_text }}
+                    </span>
+                  {%- endif -%}
+
+                  {%- if show_bulk and bulk_url != blank -%}
+                    {%- assign bulk_price = fv.price | times: 0.95 | round -%}
+                    <a href="{{ bulk_url }}" class="bzc-bulk-link">{{ bulk_text }} of ₹{{ bulk_price | money_without_currency }}</a>
+                  {%- endif -%}
+
+                  <!-- Variants -->
+                  {%- unless product.has_only_default_variant -%}
+                    <div data-product-variants>
+                      {%- for option in product.options_with_values -%}
+                        <div style="margin-top:5px;">
+                          <p class="bzc-variant-label">{{ option.name }}</p>
+                          <select class="bzc-variant-select" data-option-pos="{{ option.position }}" aria-label="{{ option.name }}">
+                            {%- for value in option.values -%}
+                              <option value="{{ value | escape }}"{% if value == option.selected_value %} selected{% endif %}>{{ value }}</option>
+                            {%- endfor -%}
+                          </select>
+                        </div>
+                      {%- endfor -%}
+                    </div>
+                  {%- endunless -%}
+
+                  <!-- Qty + Add -->
+                  <div class="bzc-footer">
+                    <div class="bzc-qty">
+                      <button type="button" class="bzc-qty-btn bzc-qty-minus" aria-label="Decrease">−</button>
+                      <span class="bzc-qty-val">1</span>
+                      <button type="button" class="bzc-qty-btn bzc-qty-plus" aria-label="Increase">+</button>
+                    </div>
+                    <button
+                      type="button"
+                      class="bzc-add-btn"
+                      data-variant-id="{{ fv.id }}"
+                      {% unless fv.available %}disabled{% endunless %}
+                    >
+                      {%- if fv.available -%}{{ btn_label }}{%- else -%}Sold Out{%- endif -%}
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+
+          <!-- Pagination -->
+          {%- if paginate.pages > 1 -%}
+            <div style="display:flex;justify-content:center;gap:8px;margin-top:32px;flex-wrap:wrap;">
+              {%- if paginate.previous -%}
+                <a href="{{ paginate.previous.url }}" style="padding:8px 18px;border:1px solid {{ card_border }};border-radius:8px;font-size:13px;text-decoration:none;color:{{ title_color }};">← Prev</a>
+              {%- endif -%}
+              {%- for part in paginate.parts -%}
+                {%- if part.is_link -%}
+                  <a href="{{ part.url }}" style="padding:8px 14px;border:1px solid {{ card_border }};border-radius:8px;font-size:13px;text-decoration:none;color:{{ title_color }};">{{ part.title }}</a>
+                {%- elsif part.title == paginate.current_page -%}
+                  <span style="padding:8px 14px;background:{{ accent }};color:#fff;border-radius:8px;font-size:13px;font-weight:700;">{{ part.title }}</span>
+                {%- else -%}
+                  <span style="padding:8px 14px;font-size:13px;color:{{ compare_color }};">{{ part.title }}</span>
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if paginate.next -%}
+                <a href="{{ paginate.next.url }}" style="padding:8px 18px;border:1px solid {{ card_border }};border-radius:8px;font-size:13px;text-decoration:none;color:{{ title_color }};">Next →</a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+        {%- else -%}
+          <div style="text-align:center;padding:60px 20px;background:{{ card_bg }};border-radius:{{ card_radius }}px;">
+            <p style="font-size:40px;margin-bottom:12px;">📦</p>
+            <h2 style="font-size:20px;color:{{ title_color }};margin:0 0 8px;">No products found</h2>
+            <p style="color:{{ compare_color }};margin:0 0 20px;">Try adjusting your filters or browse another category.</p>
+            {%- if active_filters -%}
+              <a href="{{ collection.url }}" style="background:{{ accent }};color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;">Clear Filters</a>
+            {%- else -%}
+              <a href="{{ routes.root_url }}" style="background:{{ accent }};color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;">Back to Home</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+    </div>
+    {%- endpaginate -%}
+
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  var section = document.getElementById('bzCol-{{ section.id }}');
+  if (!section) return;
+
+  var accent = '{{ accent }}';
+
+  /* ── Filter sidebar toggle (mobile) ─────────────────────── */
+  var filterToggle  = document.getElementById('bzFilterToggle');
+  var filterSidebar = document.getElementById('bzFilterSidebar');
+
+  if (filterToggle && filterSidebar) {
+    filterToggle.addEventListener('click', function () {
+      filterSidebar.classList.toggle('open');
+      filterToggle.style.color = filterSidebar.classList.contains('open') ? accent : '';
+      filterToggle.style.borderColor = filterSidebar.classList.contains('open') ? accent : '';
+    });
+  }
+
+  /* ── Filter group accordion ─────────────────────────────── */
+  section.querySelectorAll('[data-filter-toggle]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var idx  = this.dataset.filterToggle;
+      var body = section.querySelector('[data-filter-body="' + idx + '"]');
+      var chev = this.querySelector('.bzc-chevron');
+      if (!body) return;
+      body.classList.toggle('hidden');
+      if (chev) chev.style.transform = body.classList.contains('hidden') ? 'rotate(-90deg)' : '';
+    });
+  });
+
+  /* ── Filter count badge ─────────────────────────────────── */
+  var countBadge = document.getElementById('bzFilterCount');
+  if (countBadge) {
+    var total = section.querySelectorAll('.bzc-filter-cb:checked').length;
+    countBadge.textContent = total;
+    countBadge.style.display = total > 0 ? '' : 'none';
+  }
+
+  /* ── Auto-submit filters on checkbox change ─────────────── */
+  section.querySelectorAll('.bzc-filter-cb').forEach(function (cb) {
+    cb.addEventListener('change', function () {
+      if ({{ section.settings.filter_auto_apply | default: false | json }}) {
+        var form = document.getElementById('bzFilterForm');
+        if (form) form.submit();
+      }
+    });
+  });
+
+  /* ── Cards: qty + variant + add to cart ─────────────────── */
+  section.querySelectorAll('.bzc-card').forEach(function (card) {
+    var qtyVal   = card.querySelector('.bzc-qty-val');
+    var qtyMinus = card.querySelector('.bzc-qty-minus');
+    var qtyPlus  = card.querySelector('.bzc-qty-plus');
+    var addBtn   = card.querySelector('.bzc-add-btn');
+    var priceEl  = card.querySelector('[data-price]');
+    var compEl   = card.querySelector('[data-compare-price]');
+    var selects  = card.querySelectorAll('.bzc-variant-select');
+    var qty = 1;
+
+    /* Qty */
+    if (qtyMinus) qtyMinus.addEventListener('click', function () {
+      if (qty > 1) { qty--; if (qtyVal) qtyVal.textContent = qty; }
+    });
+    if (qtyPlus) qtyPlus.addEventListener('click', function () {
+      qty++;
+      if (qtyVal) qtyVal.textContent = qty;
+    });
+
+    /* Variants */
+    if (selects.length > 0) {
+      fetch('/products/' + card.dataset.productHandle + '.js')
+        .then(function (r) { return r.json(); })
+        .then(function (product) {
+          function getOpts() {
+            var o = {};
+            selects.forEach(function (s) { o[parseInt(s.dataset.optionPos, 10)] = s.value; });
+            return o;
+          }
+          function findVariant(opts) {
+            return product.variants.find(function (v) {
+              return Object.keys(opts).every(function (p) { return v['option' + p] === opts[p]; });
+            });
+          }
+          function applyVariant(v) {
+            if (!v) return;
+            if (addBtn) { addBtn.dataset.variantId = v.id; addBtn.disabled = !v.available; addBtn.textContent = v.available ? '{{ btn_label }}' : 'Sold Out'; }
+            if (priceEl) priceEl.textContent = fmt(v.price);
+            if (compEl) {
+              if (v.compare_at_price > v.price) { compEl.textContent = fmt(v.compare_at_price); compEl.style.display = ''; }
+              else { compEl.style.display = 'none'; }
+            }
+          }
+          selects.forEach(function (s) { s.addEventListener('change', function () { applyVariant(findVariant(getOpts())); }); });
+          applyVariant(findVariant(getOpts()));
+        })
+        .catch(function () {});
+    }
+
+    /* Add to cart */
+    if (addBtn) {
+      addBtn.addEventListener('click', function () {
+        if (this.disabled) return;
+        var id = parseInt(this.dataset.variantId, 10);
+        var btn = this;
+        var orig = btn.textContent;
+        btn.disabled = true; btn.textContent = '…';
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ id: id, quantity: qty })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function () {
+          btn.textContent = '✓ Added!';
+          btn.style.background = '#22c55e';
+          document.dispatchEvent(new CustomEvent('cart:update'));
+          setTimeout(function () {
+            btn.disabled = false; btn.textContent = orig; btn.style.background = '';
+            qty = 1; if (qtyVal) qtyVal.textContent = 1;
+          }, 1500);
+        })
+        .catch(function () { btn.disabled = false; btn.textContent = orig; });
+      });
+    }
+  });
+
+  function fmt(cents) {
+    return '₹' + (cents / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Collection",
+  "tag": "section",
+  "settings": [
+    { "type": "header", "content": "Grid Layout" },
+    { "type": "range",   "id": "cols_desktop",        "label": "Columns — desktop",       "min": 2, "max": 6, "step": 1, "default": 4 },
+    { "type": "range",   "id": "cols_mobile",         "label": "Columns — mobile",        "min": 1, "max": 3, "step": 1, "default": 2 },
+    { "type": "range",   "id": "card_gap",            "label": "Gap — desktop",           "min": 6, "max": 32, "step": 2, "default": 16, "unit": "px" },
+    { "type": "range",   "id": "card_gap_mobile",     "label": "Gap — mobile",            "min": 4, "max": 24, "step": 2, "default": 10, "unit": "px" },
+    { "type": "range",   "id": "products_per_page",   "label": "Products per page",       "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "header", "content": "Card Style" },
+    { "type": "color",   "id": "card_bg",             "label": "Card background",         "default": "#ffffff" },
+    { "type": "color",   "id": "card_border",         "label": "Card border",             "default": "#ebebeb" },
+    { "type": "range",   "id": "card_radius",         "label": "Card corner radius",      "min": 0, "max": 24, "step": 2, "default": 12, "unit": "px" },
+    { "type": "range",   "id": "body_pad",            "label": "Card body padding",       "min": 8, "max": 24, "step": 2, "default": 12, "unit": "px" },
+    { "type": "header", "content": "Product Image" },
+    { "type": "color",   "id": "img_bg",              "label": "Image background",        "default": "#f9f9f9" },
+    { "type": "range",   "id": "img_height",          "label": "Image height — desktop",  "min": 120, "max": 400, "step": 10, "default": 220, "unit": "px" },
+    { "type": "range",   "id": "img_height_mobile",   "label": "Image height — mobile",   "min": 80,  "max": 260, "step": 10, "default": 150, "unit": "px" },
+    { "type": "range",   "id": "img_padding",         "label": "Image padding",           "min": 0,   "max": 32,  "step": 4,  "default": 12,  "unit": "px" },
+    {
+      "type": "select",
+      "id": "img_fit",
+      "label": "Image fit",
+      "options": [
+        { "value": "contain", "label": "Contain (show full image)" },
+        { "value": "cover",   "label": "Cover (fill box)" }
+      ],
+      "default": "contain"
+    },
+    { "type": "header", "content": "Discount Badge" },
+    { "type": "checkbox","id": "show_discount_badge", "label": "Show % OFF badge",        "default": true },
+    { "type": "color",   "id": "discount_badge_bg",   "label": "Badge background",        "default": "#EF4444" },
+    { "type": "color",   "id": "discount_badge_color","label": "Badge text color",        "default": "#ffffff" },
+    { "type": "range",   "id": "discount_badge_size", "label": "Badge font size",         "min": 8, "max": 16, "step": 1, "default": 11, "unit": "px" },
+    { "type": "range",   "id": "discount_badge_radius","label": "Badge corner radius",    "min": 0, "max": 20, "step": 2, "default": 6,  "unit": "px" },
+    { "type": "range",   "id": "disc_badge_top",      "label": "Badge position — top",    "min": 4, "max": 24, "step": 2, "default": 8,  "unit": "px" },
+    { "type": "range",   "id": "disc_badge_left",     "label": "Badge position — left",   "min": 4, "max": 24, "step": 2, "default": 8,  "unit": "px" },
+    { "type": "range",   "id": "disc_badge_pad_v",    "label": "Badge padding vertical",  "min": 2, "max": 10, "step": 1, "default": 3,  "unit": "px" },
+    { "type": "range",   "id": "disc_badge_pad_h",    "label": "Badge padding horizontal","min": 4, "max": 16, "step": 2, "default": 8,  "unit": "px" },
+    { "type": "header", "content": "Assured Badge" },
+    { "type": "checkbox","id": "show_assured",        "label": "Show Assured badge",      "default": true },
+    { "type": "text",    "id": "assured_text",        "label": "Badge text",              "default": "ASSURED" },
+    { "type": "color",   "id": "assured_bg",          "label": "Badge background",        "default": "#F5A623" },
+    { "type": "color",   "id": "assured_text_color",  "label": "Badge text color",        "default": "#111111" },
+    { "type": "range",   "id": "assured_size",        "label": "Badge font size",         "min": 8, "max": 14, "step": 1, "default": 10, "unit": "px" },
+    { "type": "range",   "id": "assured_radius",      "label": "Badge radius",            "min": 0, "max": 20, "step": 2, "default": 6,  "unit": "px" },
+    { "type": "header", "content": "Product Title" },
+    { "type": "color",   "id": "title_color",         "label": "Title color",             "default": "#111111" },
+    { "type": "range",   "id": "title_size",          "label": "Title font size",         "min": 11, "max": 20, "step": 1, "default": 14, "unit": "px" },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Title font weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" }
+      ],
+      "default": "500"
+    },
+    { "type": "range",   "id": "title_lines",         "label": "Title lines (clamp)",     "min": 1, "max": 4, "step": 1, "default": 2 },
+    { "type": "header", "content": "Price" },
+    { "type": "color",   "id": "price_color",         "label": "Price color",             "default": "#111111" },
+    { "type": "range",   "id": "price_size",          "label": "Price font size",         "min": 12, "max": 24, "step": 1, "default": 16, "unit": "px" },
+    { "type": "color",   "id": "compare_color",       "label": "Compare price color",     "default": "#999999" },
+    { "type": "header", "content": "Return Badge" },
+    { "type": "checkbox","id": "show_return_badge",   "label": "Show return badge",       "default": true },
+    { "type": "text",    "id": "return_badge_text",   "label": "Badge text",              "default": "7 Day Replacement" },
+    { "type": "color",   "id": "return_badge_bg",     "label": "Badge background",        "default": "#FFF3D6" },
+    { "type": "color",   "id": "return_badge_color",  "label": "Badge text color",        "default": "#D97706" },
+    { "type": "range",   "id": "return_size",         "label": "Badge font size",         "min": 8, "max": 14, "step": 1, "default": 11, "unit": "px" },
+    { "type": "header", "content": "Bulk Price Link" },
+    { "type": "checkbox","id": "show_bulk_link",      "label": "Show bulk price link",    "default": true },
+    { "type": "text",    "id": "bulk_link_text",      "label": "Link text",               "default": "Unlock Bulk Prices" },
+    { "type": "url",     "id": "bulk_link_url",       "label": "Link URL" },
+    { "type": "range",   "id": "bulk_size",           "label": "Link font size",          "min": 10, "max": 16, "step": 1, "default": 12, "unit": "px" },
+    { "type": "header", "content": "Variant Dropdowns" },
+    { "type": "color",   "id": "accent_color",        "label": "Label color",             "default": "#0f6e56" },
+    { "type": "color",   "id": "variant_border",      "label": "Dropdown border",         "default": "#D1D5DB" },
+    { "type": "color",   "id": "variant_bg",          "label": "Dropdown background",     "default": "#ffffff" },
+    { "type": "color",   "id": "variant_text_color",  "label": "Dropdown text color",     "default": "#111111" },
+    { "type": "range",   "id": "variant_font_size",   "label": "Dropdown font size",      "min": 10, "max": 16, "step": 1, "default": 12, "unit": "px" },
+    { "type": "range",   "id": "variant_radius",      "label": "Dropdown radius",         "min": 0,  "max": 20, "step": 2, "default": 8,  "unit": "px" },
+    { "type": "range",   "id": "variant_label_size",  "label": "Label font size",         "min": 8,  "max": 14, "step": 1, "default": 11, "unit": "px" },
+    { "type": "header", "content": "Add to Cart Button" },
+    { "type": "color",   "id": "btn_bg",              "label": "Button background",       "default": "#0f6e56" },
+    { "type": "color",   "id": "btn_text_color",      "label": "Button text color",       "default": "#ffffff" },
+    { "type": "text",    "id": "btn_label",           "label": "Button text",             "default": "ADD" },
+    { "type": "range",   "id": "btn_size",            "label": "Button font size",        "min": 11, "max": 20, "step": 1, "default": 14, "unit": "px" },
+    { "type": "range",   "id": "btn_height",          "label": "Button height",           "min": 32, "max": 60, "step": 2, "default": 40, "unit": "px" },
+    { "type": "range",   "id": "btn_radius",          "label": "Button corner radius",    "min": 0,  "max": 30, "step": 2, "default": 8,  "unit": "px" },
+    { "type": "header", "content": "Qty Selector" },
+    { "type": "color",   "id": "qty_border",          "label": "Qty border color",        "default": "#D1D5DB" },
+    { "type": "color",   "id": "qty_text_color",      "label": "Qty text color",          "default": "#111111" },
+    { "type": "header", "content": "Filter Sidebar" },
+    { "type": "checkbox","id": "show_filter",         "label": "Show filter sidebar",     "default": true },
+    { "type": "range",   "id": "filter_width",        "label": "Sidebar width",           "min": 180, "max": 340, "step": 10, "default": 240, "unit": "px" },
+    { "type": "range",   "id": "filter_gap",          "label": "Gap sidebar to grid",     "min": 10, "max": 40, "step": 2, "default": 20, "unit": "px" },
+    { "type": "color",   "id": "filter_bg",           "label": "Sidebar background",      "default": "#ffffff" },
+    { "type": "range",   "id": "filter_radius",       "label": "Sidebar radius",          "min": 0,  "max": 20, "step": 2, "default": 12, "unit": "px" },
+    { "type": "text",    "id": "filter_heading",      "label": "Sidebar heading",         "default": "Filters" },
+    { "type": "color",   "id": "filter_title_color",  "label": "Filter title color",      "default": "#111111" },
+    { "type": "range",   "id": "filter_title_size",   "label": "Filter title size",       "min": 12, "max": 18, "step": 1, "default": 14, "unit": "px" },
+    { "type": "range",   "id": "filter_group_size",   "label": "Group label size",        "min": 11, "max": 16, "step": 1, "default": 13, "unit": "px" },
+    { "type": "color",   "id": "filter_item_color",   "label": "Filter item color",       "default": "#333333" },
+    { "type": "range",   "id": "filter_item_size",    "label": "Filter item size",        "min": 11, "max": 16, "step": 1, "default": 13, "unit": "px" },
+    { "type": "text",    "id": "filter_apply_text",   "label": "Apply button text",       "default": "Apply Filters" },
+    { "type": "checkbox","id": "filter_auto_apply",   "label": "Auto-apply on checkbox",  "default": false, "info": "Submits filter form automatically when checkbox clicked" },
+    { "type": "text",    "id": "filter_btn_text",     "label": "Filter toggle button text","default": "Filter" },
+    { "type": "header", "content": "Sort & Toolbar" },
+    { "type": "checkbox","id": "show_sort",           "label": "Show sort dropdown",      "default": true },
+    { "type": "color",   "id": "toolbar_bg",          "label": "Toolbar background",      "default": "#ffffff" },
+    { "type": "range",   "id": "toolbar_radius",      "label": "Toolbar radius",          "min": 0, "max": 20, "step": 2, "default": 10, "unit": "px" },
+    { "type": "range",   "id": "toolbar_font_size",   "label": "Toolbar font size",       "min": 11, "max": 16, "step": 1, "default": 13, "unit": "px" },
+    { "type": "text",    "id": "products_label",      "label": "Products count label",    "default": "products" },
+    { "type": "header", "content": "Breadcrumb" },
+    { "type": "checkbox","id": "show_breadcrumb",        "label": "Show breadcrumb",          "default": true },
+    { "type": "text",    "id": "breadcrumb_home",        "label": "Home label",               "default": "Home" },
+    { "type": "text",    "id": "breadcrumb_sep",         "label": "Separator",                "default": "›" },
+    { "type": "color",   "id": "breadcrumb_color",       "label": "Link color",               "default": "#888888" },
+    { "type": "color",   "id": "breadcrumb_active_color","label": "Current page color",       "default": "#111111" },
+    { "type": "range",   "id": "breadcrumb_size",        "label": "Font size",                "min": 10, "max": 16, "step": 1, "default": 12, "unit": "px" },
+    {
+      "type": "select",
+      "id": "breadcrumb_active_weight",
+      "label": "Current page weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" }
+      ],
+      "default": "500"
+    },
+    { "type": "header", "content": "Collection Heading" },
+    { "type": "color",   "id": "heading_color",       "label": "Heading color",           "default": "#111111" },
+    { "type": "range",   "id": "heading_size",        "label": "Heading font size",       "min": 16, "max": 36, "step": 1, "default": 22, "unit": "px" },
+    { "type": "color",   "id": "label_color",         "label": "Label / desc color",      "default": "#666666" },
+    { "type": "header", "content": "Section" },
+    { "type": "color",   "id": "section_bg",          "label": "Section background",      "default": "#f5f5f5" },
+    { "type": "range",   "id": "pad_v",               "label": "Vertical padding",        "min": 0,  "max": 60, "step": 4, "default": 20, "unit": "px" },
+    { "type": "range",   "id": "pad_h",               "label": "Horizontal padding",      "min": 8,  "max": 48, "step": 4, "default": 20, "unit": "px" }
+  ],
+  "blocks": [
+    {
+      "type": "banner",
+      "name": "Collection Banner",
+      "settings": [
+        { "type": "image_picker", "id": "image",      "label": "Banner image" },
+        { "type": "text",         "id": "text",       "label": "Banner text (if no image)" },
+        { "type": "color",        "id": "bg",         "label": "Background", "default": "#FFF3D6" },
+        { "type": "color",        "id": "text_color", "label": "Text color",  "default": "#111111" }
+      ]
+    },
+    {
+      "type": "custom_text",
+      "name": "Custom Text",
+      "settings": [
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Add a description or guide here.</p>" }
+      ]
+    },
+    { "type": "@app" }
+  ],
+  "presets": [{ "name": "Collection" }]
+}
+{% endschema %}

@@ -1,0 +1,43 @@
+{% comment %}
+  FILE: sections/apps.liquid
+  
+  This section enables App Embeds — lets you embed Shopify apps
+  (reviews, chat widgets, loyalty programs, popups, etc.) anywhere
+  on your store directly from the Theme Editor without touching code.
+
+  HOW TO USE:
+  Theme Editor → click "+" Add section → "App section"
+  OR
+  Theme Editor → "App embeds" tab (bottom left) → toggle apps on/off
+
+  Supported via:
+  1. App Embeds  — always-on snippets (chat, badges, popups)
+  2. App Blocks  — placeable blocks within this section
+{% endcomment %}
+
+<div class="qc-app-section" data-section-id="{{ section.id }}">
+  {%- for block in section.blocks -%}
+    <div class="qc-app-block" {{ block.shopify_attributes }}>
+      {{ block.settings.app_block }}
+    </div>
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "App Section",
+  "tag": "div",
+  "class": "qc-apps",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "App Section"
+    }
+  ]
+}
+{% endschema %}

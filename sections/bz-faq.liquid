@@ -1,0 +1,136 @@
+{% comment %}FILE: sections/bz-faq.liquid{% endcomment %}
+
+<section class="bz-section bz-faq" data-section-id="{{ section.id }}" style="background:{{ section.settings.bg_color | default: '#FFFFFF' }};">
+  <div class="bz-inner" style="padding:32px var(--bz-pad-h);">
+
+    {%- if section.settings.title != blank -%}
+      <div style="text-align:{{ section.settings.title_align | default: 'left' }};margin-bottom:24px;">
+        <h2 class="bz-section-title" style="font-size:var(--bz-font-2xl);">{{ section.settings.title }}</h2>
+        {%- if section.settings.subtitle != blank -%}
+          <p style="color:var(--bz-gray);margin:8px 0 0;font-size:var(--bz-font-base);">{{ section.settings.subtitle }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="bz-faq__list" style="max-width:{{ section.settings.max_width | default: 720 }}px;margin:0 auto;">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'faq_item' -%}
+          <details class="bz-faq__item" {{ block.shopify_attributes }}>
+            <summary class="bz-faq__question">
+              {{ block.settings.question }}
+              <span class="bz-faq__icon" aria-hidden="true">+</span>
+            </summary>
+            <div class="bz-faq__answer">
+              {{ block.settings.answer }}
+            </div>
+          </details>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .bz-faq__list { display: flex; flex-direction: column; gap: 0; }
+
+  .bz-faq__item {
+    border-bottom: 1px solid var(--bz-border);
+  }
+  .bz-faq__item:first-child { border-top: 1px solid var(--bz-border); }
+
+  .bz-faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 4px;
+    font-size: var(--bz-font-md);
+    font-weight: 600;
+    color: var(--bz-black);
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.15s;
+    user-select: none;
+  }
+  .bz-faq__question::-webkit-details-marker { display: none; }
+  .bz-faq__question:hover { color: var(--bz-yellow-dark); }
+
+  .bz-faq__icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: var(--bz-gray-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--bz-gray);
+    transition: transform 0.2s, background 0.15s;
+  }
+
+  details[open] .bz-faq__icon {
+    transform: rotate(45deg);
+    background: var(--bz-yellow-light);
+    color: var(--bz-yellow-dark);
+  }
+
+  .bz-faq__answer {
+    padding: 0 4px 16px;
+    font-size: var(--bz-font-base);
+    color: var(--bz-gray-dark);
+    line-height: 1.7;
+    animation: bz-faq-open 0.2s ease;
+  }
+
+  @keyframes bz-faq-open {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Section title", "default": "Frequently Asked Questions" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle (optional)" },
+    {
+      "type": "select",
+      "id": "title_align",
+      "label": "Title alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "center"
+    },
+    { "type": "range", "id": "max_width", "label": "Content max width", "min": 480, "max": 1000, "step": 40, "default": 720, "unit": "px" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FFFFFF" }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "FAQ Item",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "How fast is the delivery?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>We deliver within 10-60 minutes across serviceable areas.</p>" }
+      ]
+    },
+    { "type": "@app" }
+  ],
+  "presets": [{
+    "name": "FAQ",
+    "blocks": [
+      { "type": "faq_item", "settings": { "question": "How fast is the delivery?", "answer": "<p>We deliver within 10-60 minutes across Bathinda.</p>" } },
+      { "type": "faq_item", "settings": { "question": "Do you deliver outside Bathinda?", "answer": "<p>Currently we deliver only within Bathinda. Enter your pincode on the homepage to check serviceability.</p>" } },
+      { "type": "faq_item", "settings": { "question": "What payment methods are available?", "answer": "<p>We accept Cash on Delivery (COD) and UPI payments.</p>" } },
+      { "type": "faq_item", "settings": { "question": "Can I return a product?", "answer": "<p>Yes, hassle-free returns within 7 days of delivery. Contact us on WhatsApp.</p>" } },
+      { "type": "faq_item", "settings": { "question": "How can I place a bulk order?", "answer": "<p>Click the 'Request a Quote' button or WhatsApp us directly. We offer special pricing for bulk and contractor orders.</p>" } }
+    ]
+  }]
+}
+{% endschema %}

@@ -1,0 +1,301 @@
+{% comment %}
+  FILE: sections/bz-hero.liquid
+  Buildzo-style hero — full-width with worker image, delivery badge,
+  headline, USP strip, and inline pincode checker
+{% endcomment %}
+
+{%- assign bg_color  = section.settings.bg_color  | default: '#1A1A1A' -%}
+{%- assign txt_color = section.settings.txt_color | default: '#FFFFFF' -%}
+
+<style>
+  #bz-hero-{{ section.id }} {
+    background: {{ bg_color }};
+    color: {{ txt_color }};
+    min-height: {{ section.settings.height_desktop | default: 400 }}px;
+    position: relative;
+    overflow: hidden;
+  }
+  #bz-hero-{{ section.id }} .bz-hero__layout {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 32px;
+    padding: 40px var(--bz-pad-h);
+    max-width: var(--bz-max-width);
+    margin: 0 auto;
+    min-height: inherit;
+  }
+  @media (max-width: 768px) {
+    #bz-hero-{{ section.id }} { min-height: {{ section.settings.height_mobile | default: 280 }}px; }
+    #bz-hero-{{ section.id }} .bz-hero__img-col { display: none; }
+    #bz-hero-{{ section.id }} .bz-hero__layout { grid-template-columns: 1fr; }
+  }
+</style>
+
+<section id="bz-hero-{{ section.id }}" class="bz-section" data-section-id="{{ section.id }}">
+
+  {%- if section.settings.bg_image != blank -%}
+    <div class="bz-hero__bg-img" style="position:absolute;inset:0;z-index:0;">
+      <picture>
+        {%- if section.settings.bg_image_mobile != blank -%}
+          <source media="(max-width:768px)" srcset="{{ section.settings.bg_image_mobile | image_url: width: 800 }}" />
+        {%- endif -%}
+        <img src="{{ section.settings.bg_image | image_url: width: 1600 }}" alt="" width="1600" height="{{ section.settings.height_desktop | default: 400 }}" style="width:100%;height:100%;object-fit:cover;opacity:0.35;" loading="eager" />
+      </picture>
+    </div>
+  {%- endif -%}
+
+  <div class="bz-hero__layout" style="position:relative;z-index:1;">
+
+    <!-- Text content -->
+    <div class="bz-hero__text-col">
+
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="bz-hero__eyebrow" style="font-size:{{ section.settings.eyebrow_size | default: 12 }}px; font-weight:600; color:{{ section.settings.eyebrow_color | default: '#F5A623' }};letter-spacing:0.06em;text-transform:{{ section.settings.eyebrow_transform | default: 'uppercase' }};margin:0 0 10px;">
+          {{ section.settings.eyebrow }}
+        </p>
+      {%- endif -%}
+
+      <h1 class="bz-hero__heading" style="font-size:{{ section.settings.heading_size | default: 40 }}px; font-weight:{{ section.settings.heading_weight | default: '800' }}; color:{{ section.settings.heading_color | default: '#FFFFFF' }};line-height:1.1;letter-spacing:-0.02em;margin:0 0 14px;max-width:560px;">
+        {{ section.settings.heading | default: "Fastest Delivery of Construction Materials" }}
+      </h1>
+
+      {%- if section.settings.subheading != blank -%}
+        <p class="bz-hero__sub" style="font-size:{{ section.settings.subheading_size | default: 15 }}px; color:{{ section.settings.subheading_color | default: '#FFFFFF' }}; opacity:{{ section.settings.subheading_opacity | default: 80 | divided_by: 100.0 }};margin:0 0 20px;line-height:1.5;max-width:440px;">
+          {{ section.settings.subheading }}
+        </p>
+      {%- endif -%}
+
+      <!-- USP chips -->
+      {%- if section.settings.show_usps -%}
+        <div class="bz-hero__usps" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'usp' -%}
+              <span class="bz-hero__usp" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:999px;padding:5px 12px;font-size:var(--bz-font-sm);font-weight:500;" {{ block.shopify_attributes }}>
+                {{ block.settings.icon }} {{ block.settings.text }}
+              </span>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      <!-- Pincode checker inline -->
+      {%- if section.settings.show_pincode_checker -%}
+        <div class="bz-hero__pincode" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:var(--bz-radius-lg);padding:16px 20px;max-width:420px;">
+          <p style="font-size:var(--bz-font-sm);font-weight:600;margin:0 0 10px;display:flex;align-items:center;gap:6px;">
+            📍 {{ section.settings.pincode_label | default: 'Check if we deliver to your location' }}
+          </p>
+          <div style="display:flex;gap:8px;">
+            <input
+              type="text"
+              id="heroPincodeInput"
+              class="bz-input"
+              placeholder="{{ section.settings.pincode_placeholder | default: 'Enter your pincode' }}"
+              maxlength="6"
+              inputmode="numeric"
+              style="background:rgba(255,255,255,0.95);color:var(--bz-black);flex:1;"
+            />
+            <button
+              type="button"
+              id="heroPincodeCheck"
+              class="bz-btn bz-btn--primary"
+            >
+              {{ section.settings.pincode_btn | default: 'Check' }}
+            </button>
+          </div>
+          <p class="bz-hero__pincode-result" id="heroPincodeResult" style="margin:8px 0 0;font-size:var(--bz-font-sm);min-height:18px;" aria-live="polite"></p>
+        </div>
+      {%- endif -%}
+
+      <!-- CTA buttons -->
+      <div class="bz-hero__ctas" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'cta_button' -%}
+            <a
+              href="{{ block.settings.url }}"
+              class="bz-btn bz-btn--{{ block.settings.style | default: 'primary' }}"
+              {{ block.shopify_attributes }}
+            >
+              {%- if block.settings.icon != blank -%}{{ block.settings.icon }}{%- endif -%}
+              {{ block.settings.label }}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+    </div>
+
+    <!-- Product / hero image -->
+    {%- if section.settings.hero_image != blank -%}
+      <div class="bz-hero__img-col" style="width:{{ section.settings.hero_image_width | default: 340 }}px;flex-shrink:0;">
+        <picture>
+          {%- if section.settings.hero_image_mobile != blank -%}
+            <source media="(max-width:768px)" srcset="{{ section.settings.hero_image_mobile | image_url: width: 400 }}" />
+          {%- endif -%}
+          <img
+            src="{{ section.settings.hero_image | image_url: width: 700 }}"
+            alt="{{ section.settings.heading | escape }}"
+            width="{{ section.settings.hero_image_width | default: 340 }}"
+            height="{{ section.settings.height_desktop | default: 400 }}"
+            loading="eager"
+            style="width:100%;height:auto;object-fit:contain;drop-shadow(0 8px 24px rgba(0,0,0,0.3));"
+          />
+        </picture>
+      </div>
+    {%- endif -%}
+
+    <!-- Delivery time badge (floating) -->
+    {%- if section.settings.show_delivery_badge -%}
+      <div class="bz-hero__delivery-badge" style="position:absolute;top:40px;right:40px;background:var(--bz-yellow);color:var(--bz-black);border-radius:50%;width:90px;height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;text-align:center;line-height:1.2;box-shadow:0 4px 16px rgba(245,166,35,0.4);">
+        <span style="font-size:18px;">{{ section.settings.delivery_min }}-{{ section.settings.delivery_max }}</span>
+        <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.04em;">{{ section.settings.delivery_unit | default: 'MIN' }}</span>
+        <span style="font-size:9px;text-transform:uppercase;letter-spacing:0.04em;">{{ section.settings.delivery_label | default: 'DELIVERY' }}</span>
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+<script>
+(function() {
+  var input   = document.getElementById('heroPincodeInput');
+  var btn     = document.getElementById('heroPincodeCheck');
+  var result  = document.getElementById('heroPincodeResult');
+  if (!btn || !input || !result) return;
+
+  btn.addEventListener('click', function() {
+    var pin = input.value.trim();
+    if (pin.length !== 6 || !/^\d+$/.test(pin)) {
+      result.textContent = '⚠️ Please enter a valid 6-digit pincode';
+      result.style.color = '#FCA5A5';
+      return;
+    }
+    var map = window.QCDeliveryMap || {};
+    if (map[pin]) {
+      result.innerHTML = '✅ Great! We deliver to <strong>' + map[pin].area + '</strong> in <strong>' + map[pin].time + '</strong>';
+      result.style.color = '#86EFAC';
+    } else {
+      result.innerHTML = '❌ Sorry, we don\'t deliver to <strong>' + pin + '</strong> yet.';
+      result.style.color = '#FCA5A5';
+    }
+  });
+
+  if (input) {
+    input.addEventListener('input', function() { this.value = this.value.replace(/\D/g,''); });
+    input.addEventListener('keydown', function(e) { if(e.key==='Enter') btn.click(); });
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "tag": "section",
+  "settings": [
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bg_color", "label": "Background color", "default": "#1A1A1A" },
+    { "type": "color", "id": "txt_color", "label": "General text color", "default": "#FFFFFF" },
+    { "type": "header", "content": "Eyebrow Text" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "BATHINDA'S" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow color", "default": "#F5A623" },
+    { "type": "range", "id": "eyebrow_size", "label": "Eyebrow font size", "min": 10, "max": 24, "step": 1, "default": 12, "unit": "px" },
+    {
+      "type": "select",
+      "id": "eyebrow_transform",
+      "label": "Eyebrow text case",
+      "options": [
+        { "value": "uppercase", "label": "ALL CAPS" },
+        { "value": "capitalize", "label": "Title Case" },
+        { "value": "none", "label": "As typed" }
+      ],
+      "default": "uppercase"
+    },
+    { "type": "header", "content": "Heading" },
+    { "type": "textarea", "id": "heading", "label": "Heading text", "default": "Fastest Delivery of Construction Materials" },
+    { "type": "color", "id": "heading_color", "label": "Heading color", "default": "#FFFFFF" },
+    { "type": "range", "id": "heading_size", "label": "Heading font size", "min": 16, "max": 72, "step": 2, "default": 40, "unit": "px" },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Heading font weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" },
+        { "value": "800", "label": "Extra Bold" }
+      ],
+      "default": "800"
+    },
+    { "type": "header", "content": "Subheading" },
+    { "type": "text", "id": "subheading", "label": "Subheading text", "default": "Building your dreams, delivered in minutes." },
+    { "type": "color", "id": "subheading_color", "label": "Subheading color", "default": "#FFFFFF" },
+    { "type": "range", "id": "subheading_size", "label": "Subheading font size", "min": 12, "max": 28, "step": 1, "default": 15, "unit": "px" },
+    { "type": "range", "id": "subheading_opacity", "label": "Subheading opacity", "min": 30, "max": 100, "step": 5, "default": 80, "unit": "%" },
+    { "type": "image_picker", "id": "bg_image", "label": "Background image (desktop)" },
+    { "type": "image_picker", "id": "bg_image_mobile", "label": "Background image (mobile)" },
+    { "type": "image_picker", "id": "hero_image", "label": "Hero product/person image" },
+    { "type": "image_picker", "id": "hero_image_mobile", "label": "Hero image — mobile version" },
+    { "type": "range", "id": "hero_image_width", "label": "Hero image width", "min": 200, "max": 600, "step": 20, "default": 340, "unit": "px" },
+    { "type": "header", "content": "Size" },
+    { "type": "range", "id": "height_desktop", "label": "Height on desktop", "min": 280, "max": 600, "step": 20, "default": 400, "unit": "px" },
+    { "type": "range", "id": "height_mobile", "label": "Height on mobile", "min": 200, "max": 400, "step": 20, "default": 280, "unit": "px" },
+    { "type": "header", "content": "Delivery Badge" },
+    { "type": "checkbox", "id": "show_delivery_badge", "label": "Show delivery time badge", "default": true },
+    { "type": "text", "id": "delivery_min", "label": "Min delivery time", "default": "10" },
+    { "type": "text", "id": "delivery_max", "label": "Max delivery time", "default": "60" },
+    { "type": "text", "id": "delivery_unit", "label": "Time unit", "default": "MIN" },
+    { "type": "text", "id": "delivery_label", "label": "Badge label", "default": "DELIVERY" },
+    { "type": "header", "content": "Pincode Checker" },
+    { "type": "checkbox", "id": "show_pincode_checker", "label": "Show pincode checker", "default": true },
+    { "type": "text", "id": "pincode_label", "label": "Checker label", "default": "Check if we deliver to your location" },
+    { "type": "text", "id": "pincode_placeholder", "label": "Input placeholder", "default": "Enter your pincode" },
+    { "type": "text", "id": "pincode_btn", "label": "Button text", "default": "Check" },
+    { "type": "header", "content": "USP Chips" },
+    { "type": "checkbox", "id": "show_usps", "label": "Show USP chips", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP Chip",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Emoji icon", "default": "⚡" },
+        { "type": "text", "id": "text", "label": "USP text", "default": "10-60 Min Delivery" }
+      ]
+    },
+    {
+      "type": "cta_button",
+      "name": "CTA Button",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Button label", "default": "Shop Now" },
+        { "type": "url", "id": "url", "label": "Link" },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "options": [
+            { "value": "primary", "label": "Yellow" },
+            { "value": "black", "label": "Black" },
+            { "value": "outline", "label": "Outline" }
+          ],
+          "default": "primary"
+        },
+        { "type": "text", "id": "icon", "label": "Emoji icon (optional)" }
+      ]
+    },
+    { "type": "@app" }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner",
+      "blocks": [
+        { "type": "usp", "settings": { "icon": "⚡", "text": "10-60 Min Delivery" } },
+        { "type": "usp", "settings": { "icon": "🏷️", "text": "Best Prices Guaranteed" } },
+        { "type": "usp", "settings": { "icon": "✅", "text": "Trusted by Builders" } },
+        { "type": "cta_button", "settings": { "label": "Shop Now", "style": "primary" } },
+        { "type": "cta_button", "settings": { "label": "Bulk Order", "style": "outline" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

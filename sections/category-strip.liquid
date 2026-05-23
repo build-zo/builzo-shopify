@@ -1,0 +1,461 @@
+{% comment %}FILE: sections/category-strip.liquid{% endcomment %}
+
+<section
+  id="bzCat-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+  style="
+    background: {{ section.settings.section_bg | default: '#ffffff' }};
+    padding-top: {{ section.settings.pad_top | default: 24 }}px;
+    padding-bottom: {{ section.settings.pad_bottom | default: 24 }}px;
+  "
+>
+
+  {%- comment -%} Section heading row {%- endcomment -%}
+  {%- if section.settings.title != blank or section.settings.view_all_url != blank -%}
+    <div style="
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 {{ section.settings.side_pad | default: 20 }}px {{ section.settings.title_gap | default: 16 }}px;
+      max-width: 1280px;
+      margin: 0 auto;
+    ">
+      {%- if section.settings.title != blank -%}
+        <h2 style="
+          margin: 0;
+          font-size: {{ section.settings.title_size | default: 18 }}px;
+          font-weight: {{ section.settings.title_weight | default: '700' }};
+          color: {{ section.settings.title_color | default: '#111111' }};
+          letter-spacing: -0.01em;
+        ">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.view_all_url != blank -%}
+        <a href="{{ section.settings.view_all_url }}" style="
+          font-size: {{ section.settings.viewall_size | default: 13 }}px;
+          font-weight: 600;
+          color: {{ section.settings.viewall_color | default: '#0f6e56' }};
+          text-decoration: none;
+          white-space: nowrap;
+          flex-shrink: 0;
+        ">{{ section.settings.viewall_text | default: 'View all' }} →</a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} Scrollable cards {%- endcomment -%}
+  {%- if section.blocks.size > 0 -%}
+    <div style="
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding: 4px {{ section.settings.side_pad | default: 20 }}px {{ section.settings.scroll_pb | default: 8 }}px;
+      max-width: 1280px;
+      margin: 0 auto;
+    " class="bzcat-scroll-{{ section.id }}">
+
+      <div style="
+        display: flex;
+        gap: {{ section.settings.card_gap | default: 14 }}px;
+        width: max-content;
+      ">
+
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'card' -%}
+
+            {%- comment -%} Resolve collection {%- endcomment -%}
+            {%- assign col = collections[block.settings.collection] -%}
+
+            {%- comment -%} Label {%- endcomment -%}
+            {%- if block.settings.label != blank -%}
+              {%- assign the_label = block.settings.label -%}
+            {%- elsif col != blank -%}
+              {%- assign the_label = col.title -%}
+            {%- else -%}
+              {%- assign the_label = 'Category' -%}
+            {%- endif -%}
+
+            {%- comment -%} URL {%- endcomment -%}
+            {%- if block.settings.link != blank -%}
+              {%- assign the_url = block.settings.link -%}
+            {%- elsif col != blank -%}
+              {%- assign the_url = col.url -%}
+            {%- else -%}
+              {%- assign the_url = '#' -%}
+            {%- endif -%}
+
+            {%- comment -%} Subtitle {%- endcomment -%}
+            {%- if block.settings.subtitle != blank -%}
+              {%- assign the_subtitle = block.settings.subtitle -%}
+            {%- elsif col != blank and col.description != blank -%}
+              {%- assign the_subtitle = col.description | strip_html | truncate: 40 -%}
+            {%- else -%}
+              {%- assign the_subtitle = nil -%}
+            {%- endif -%}
+
+            {%- comment -%} Product count {%- endcomment -%}
+            {%- assign the_count = nil -%}
+            {%- if col != blank and col.products_count > 0 -%}
+              {%- assign the_count = col.products_count -%}
+            {%- endif -%}
+
+            {%- comment -%} Card width / height from block or section default {%- endcomment -%}
+            {%- assign cw = section.settings.card_width | default: 160 -%}
+            {%- assign ih = section.settings.img_height | default: 150 -%}
+            {%- assign cr = section.settings.card_radius | default: 14 -%}
+
+            <a
+              href="{{ the_url }}"
+              {{ block.shopify_attributes }}
+              style="
+                display: block;
+                text-decoration: none;
+                color: inherit;
+                width: {{ cw }}px;
+                flex-shrink: 0;
+                border-radius: {{ cr }}px;
+                overflow: hidden;
+                background: {{ section.settings.card_bg | default: '#ffffff' }};
+                border: {{ section.settings.border_width | default: 1 }}px solid {{ section.settings.border_color | default: '#E8E8E8' }};
+                {% if section.settings.show_shadow %}box-shadow: {{ section.settings.shadow_value | default: '0 2px 12px rgba(0,0,0,0.08)' }};{% endif %}
+                transition: transform 0.18s ease, box-shadow 0.18s ease;
+              "
+              onmouseenter="this.style.transform='translateY(-{{ section.settings.hover_lift | default: 4 }}px)';this.style.boxShadow='{{ section.settings.shadow_hover | default: '0 8px 24px rgba(0,0,0,0.14)' }}';"
+              onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='{{ section.settings.shadow_value | default: '0 2px 12px rgba(0,0,0,0.08)' }}';"
+            >
+
+              {%- comment -%} IMAGE AREA {%- endcomment -%}
+              <div style="
+                width: 100%;
+                height: {{ ih }}px;
+                overflow: hidden;
+                position: relative;
+                background: {{ section.settings.img_bg | default: '#F5F5F5' }};
+                border-radius: {{ cr }}px {{ cr }}px 0 0;
+              ">
+
+                {%- comment -%} Resolve image: custom > collection > first product {%- endcomment -%}
+                {%- assign has_img = false -%}
+
+                {%- if block.settings.image != blank -%}
+                  <img
+                    src="{{ block.settings.image | image_url: width: 600 }}"
+                    alt="{{ the_label | escape }}"
+                    width="{{ cw }}"
+                    height="{{ ih }}"
+                    loading="lazy"
+                    style="width:100%;height:100%;object-fit:{{ section.settings.img_fit | default: 'cover' }};display:block;transition:transform 0.25s ease;"
+                    onmouseenter="this.style.transform='scale({{ section.settings.img_zoom | default: 106 | divided_by: 100.0 }})';"
+                    onmouseleave="this.style.transform='scale(1)';"
+                  />
+                  {%- assign has_img = true -%}
+                {%- elsif col != blank and col.image != blank -%}
+                  <img
+                    src="{{ col.image | image_url: width: 600 }}"
+                    alt="{{ the_label | escape }}"
+                    width="{{ cw }}"
+                    height="{{ ih }}"
+                    loading="lazy"
+                    style="width:100%;height:100%;object-fit:{{ section.settings.img_fit | default: 'cover' }};display:block;transition:transform 0.25s ease;"
+                    onmouseenter="this.style.transform='scale({{ section.settings.img_zoom | default: 106 | divided_by: 100.0 }})';"
+                    onmouseleave="this.style.transform='scale(1)';"
+                  />
+                  {%- assign has_img = true -%}
+                {%- elsif col != blank and col.products.first != blank and col.products.first.featured_image != blank -%}
+                  <img
+                    src="{{ col.products.first.featured_image | image_url: width: 600 }}"
+                    alt="{{ the_label | escape }}"
+                    width="{{ cw }}"
+                    height="{{ ih }}"
+                    loading="lazy"
+                    style="width:100%;height:100%;object-fit:{{ section.settings.img_fit | default: 'cover' }};display:block;transition:transform 0.25s ease;"
+                    onmouseenter="this.style.transform='scale({{ section.settings.img_zoom | default: 106 | divided_by: 100.0 }})';"
+                    onmouseleave="this.style.transform='scale(1)';"
+                  />
+                  {%- assign has_img = true -%}
+                {%- endif -%}
+
+                {%- unless has_img -%}
+                  <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:{{ ih | divided_by: 2 | at_most: 52 }}px;">
+                    {{ block.settings.emoji | default: '📦' }}
+                  </div>
+                {%- endunless -%}
+
+                {%- comment -%} Dark overlay {%- endcomment -%}
+                {%- if section.settings.overlay_opacity > 0 -%}
+                  <div style="position:absolute;inset:0;background:rgba(0,0,0,{{ section.settings.overlay_opacity | times: 0.01 }});pointer-events:none;"></div>
+                {%- endif -%}
+
+                {%- comment -%} Badge {%- endcomment -%}
+                {%- if block.settings.badge != blank -%}
+                  <span style="
+                    position: absolute;
+                    top: {{ section.settings.badge_top | default: 8 }}px;
+                    left: {{ section.settings.badge_left | default: 8 }}px;
+                    background: {{ block.settings.badge_bg | default: '#F5A623' }};
+                    color: {{ block.settings.badge_text | default: '#111111' }};
+                    font-size: {{ section.settings.badge_size | default: 10 }}px;
+                    font-weight: 700;
+                    padding: {{ section.settings.badge_pad_v | default: 3 }}px {{ section.settings.badge_pad_h | default: 8 }}px;
+                    border-radius: {{ section.settings.badge_radius | default: 6 }}px;
+                    letter-spacing: 0.03em;
+                    z-index: 2;
+                    line-height: 1.2;
+                  ">{{ block.settings.badge }}</span>
+                {%- endif -%}
+
+                {%- comment -%} Overlay label position {%- endcomment -%}
+                {%- if section.settings.label_position == 'overlay' -%}
+                  <div style="
+                    position: absolute;
+                    bottom: 0; left: 0; right: 0;
+                    padding: {{ section.settings.label_pad_v | default: 10 }}px {{ section.settings.label_pad_h | default: 12 }}px;
+                    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+                    z-index: 2;
+                  ">
+                    <p style="margin:0;font-size:{{ section.settings.label_size | default: 13 }}px;font-weight:{{ section.settings.label_weight | default: '600' }};color:#ffffff;line-height:1.3;text-align:{{ section.settings.label_align | default: 'left' }};">{{ the_label }}</p>
+                    {%- if section.settings.show_count and the_count -%}
+                      <p style="margin:3px 0 0;font-size:{{ section.settings.count_size | default: 11 }}px;color:rgba(255,255,255,0.75);text-align:{{ section.settings.label_align | default: 'left' }};">{{ the_count }} items</p>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+
+              </div>
+
+              {%- comment -%} BELOW-IMAGE LABEL {%- endcomment -%}
+              {%- if section.settings.label_position == 'below' -%}
+                <div style="
+                  padding: {{ section.settings.label_pad_v | default: 10 }}px {{ section.settings.label_pad_h | default: 12 }}px;
+                  background: {{ section.settings.label_bg | default: '#ffffff' }};
+                ">
+                  <p style="
+                    margin: 0;
+                    font-size: {{ section.settings.label_size | default: 13 }}px;
+                    font-weight: {{ section.settings.label_weight | default: '600' }};
+                    color: {{ section.settings.label_color | default: '#111111' }};
+                    text-align: {{ section.settings.label_align | default: 'center' }};
+                    line-height: 1.35;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                  ">{{ the_label }}</p>
+
+                  {%- if the_subtitle != blank and section.settings.show_subtitle -%}
+                    <p style="
+                      margin: 4px 0 0;
+                      font-size: {{ section.settings.subtitle_size | default: 11 }}px;
+                      color: {{ section.settings.subtitle_color | default: '#888888' }};
+                      text-align: {{ section.settings.label_align | default: 'center' }};
+                      line-height: 1.3;
+                    ">{{ the_subtitle }}</p>
+                  {%- endif -%}
+
+                  {%- if section.settings.show_count and the_count -%}
+                    <p style="
+                      margin: 3px 0 0;
+                      font-size: {{ section.settings.count_size | default: 11 }}px;
+                      color: {{ section.settings.count_color | default: '#888888' }};
+                      text-align: {{ section.settings.label_align | default: 'center' }};
+                      font-weight: 500;
+                    ">{{ the_count }} items</p>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+
+      </div>
+    </div>
+
+    <style>
+      .bzcat-scroll-{{ section.id }}::-webkit-scrollbar { display: none; }
+    </style>
+
+  {%- else -%}
+    <div style="margin:0 20px;padding:20px;background:#fffbe6;border:1px dashed #f0d060;border-radius:10px;font-size:13px;color:#888;text-align:center;line-height:1.8;">
+      <strong>No categories yet.</strong><br>
+      Click <strong>Add block → Category Card</strong> and select a collection.
+    </div>
+  {%- endif -%}
+
+</section>
+
+{% schema %}
+{
+  "name": "Category Strip",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Title"
+    },
+    { "type": "text",   "id": "title",        "label": "Title text",       "default": "Shop by Category" },
+    { "type": "color",  "id": "title_color",  "label": "Title color",      "default": "#111111" },
+    { "type": "range",  "id": "title_size",   "label": "Title size",       "min": 8, "max": 36, "step": 1, "default": 18, "unit": "px" },
+    { "type": "select", "id": "title_weight", "label": "Title weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" },
+        { "value": "800", "label": "Extra Bold" }
+      ], "default": "700"
+    },
+    { "type": "range",  "id": "title_gap",    "label": "Space below title", "min": 8, "max": 40, "step": 2, "default": 16, "unit": "px" },
+    { "type": "url",    "id": "view_all_url", "label": "View all — link" },
+    { "type": "text",   "id": "viewall_text", "label": "View all — label", "default": "View all" },
+    { "type": "color",  "id": "viewall_color","label": "View all — color", "default": "#0f6e56" },
+    { "type": "range",  "id": "viewall_size", "label": "View all — size",  "min": 8, "max": 18, "step": 1, "default": 13, "unit": "px" },
+    {
+      "type": "header",
+      "content": "Card Size"
+    },
+    { "type": "range", "id": "card_width",  "label": "Card width",        "min": 100, "max": 300, "step": 10, "default": 160, "unit": "px" },
+    { "type": "range", "id": "img_height",  "label": "Image height",      "min": 80,  "max": 320, "step": 10, "default": 150, "unit": "px" },
+    { "type": "range", "id": "card_gap",    "label": "Gap between cards", "min": 6,   "max": 40,  "step": 2,  "default": 14,  "unit": "px" },
+    { "type": "range", "id": "card_radius", "label": "Card corner radius","min": 0,   "max": 32,  "step": 2,  "default": 14,  "unit": "px" },
+    {
+      "type": "header",
+      "content": "Card Style"
+    },
+    { "type": "color",   "id": "card_bg",       "label": "Card background",    "default": "#ffffff" },
+    { "type": "color",   "id": "img_bg",        "label": "Image placeholder bg","default": "#F5F5F5" },
+    { "type": "range",   "id": "border_width",  "label": "Border thickness",   "min": 0, "max": 4, "step": 1, "default": 1, "unit": "px" },
+    { "type": "color",   "id": "border_color",  "label": "Border color",       "default": "#E8E8E8" },
+    { "type": "checkbox","id": "show_shadow",   "label": "Show shadow",        "default": true },
+    { "type": "text",    "id": "shadow_value",  "label": "Shadow (CSS value)", "default": "0 2px 12px rgba(0,0,0,0.08)", "info": "e.g. 0 4px 16px rgba(0,0,0,0.12)" },
+    { "type": "text",    "id": "shadow_hover",  "label": "Shadow on hover",    "default": "0 8px 24px rgba(0,0,0,0.14)" },
+    { "type": "range",   "id": "hover_lift",    "label": "Lift on hover (px)", "min": 0, "max": 12, "step": 1, "default": 4, "unit": "px" },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "select",
+      "id": "img_fit",
+      "label": "Image fit",
+      "options": [
+        { "value": "cover",   "label": "Cover — fill card" },
+        { "value": "contain", "label": "Contain — show full image" },
+        { "value": "fill",    "label": "Stretch" }
+      ],
+      "default": "cover"
+    },
+    { "type": "range", "id": "img_zoom",         "label": "Zoom on hover", "min": 100, "max": 120, "step": 1, "default": 106, "unit": "%",
+      "info": "100 = no zoom. Value is divided by 100 internally." },
+    { "type": "range", "id": "overlay_opacity",  "label": "Dark overlay on image (0 = off)", "min": 0, "max": 60, "step": 5, "default": 0, "unit": "%" },
+    {
+      "type": "header",
+      "content": "Label"
+    },
+    {
+      "type": "select",
+      "id": "label_position",
+      "label": "Label position",
+      "options": [
+        { "value": "below",   "label": "Below image" },
+        { "value": "overlay", "label": "Over image (bottom)" }
+      ],
+      "default": "below"
+    },
+    { "type": "color",  "id": "label_bg",      "label": "Label background",  "default": "#ffffff" },
+    { "type": "color",  "id": "label_color",   "label": "Label text color",  "default": "#111111" },
+    { "type": "range",  "id": "label_size",    "label": "Label font size",   "min": 8, "max": 22, "step": 1, "default": 13, "unit": "px" },
+    { "type": "select", "id": "label_weight",  "label": "Label font weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ], "default": "600"
+    },
+    {
+      "type": "select",
+      "id": "label_align",
+      "label": "Label alignment",
+      "options": [
+        { "value": "left",   "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right",  "label": "Right" }
+      ],
+      "default": "center"
+    },
+    { "type": "range", "id": "label_pad_v", "label": "Label vertical padding",   "min": 6, "max": 28, "step": 2, "default": 10, "unit": "px" },
+    { "type": "range", "id": "label_pad_h", "label": "Label horizontal padding", "min": 6, "max": 28, "step": 2, "default": 12, "unit": "px" },
+    {
+      "type": "header",
+      "content": "Subtitle and Count"
+    },
+    { "type": "checkbox", "id": "show_subtitle",    "label": "Show subtitle",         "default": false },
+    { "type": "range",    "id": "subtitle_size",    "label": "Subtitle font size",    "min": 8, "max": 16, "step": 1, "default": 11, "unit": "px" },
+    { "type": "color",    "id": "subtitle_color",   "label": "Subtitle color",        "default": "#888888" },
+    { "type": "checkbox", "id": "show_count",       "label": "Show product count",    "default": true },
+    { "type": "range",    "id": "count_size",       "label": "Count font size",       "min": 8, "max": 16, "step": 1, "default": 11, "unit": "px" },
+    { "type": "color",    "id": "count_color",      "label": "Count color",           "default": "#888888" },
+    {
+      "type": "header",
+      "content": "Badge"
+    },
+    { "type": "range", "id": "badge_size",    "label": "Badge font size",    "min": 8, "max": 16, "step": 1, "default": 11, "unit": "px" },
+    { "type": "range", "id": "badge_radius",  "label": "Badge corner radius","min": 0, "max": 20, "step": 2, "default": 6, "unit": "px" },
+    { "type": "range", "id": "badge_pad_v",   "label": "Badge padding top/bottom","min": 2, "max": 10, "step": 1, "default": 3, "unit": "px" },
+    { "type": "range", "id": "badge_pad_h",   "label": "Badge padding left/right", "min": 4, "max": 16, "step": 2, "default": 8, "unit": "px" },
+    { "type": "range", "id": "badge_top",     "label": "Badge position — top",  "min": 4, "max": 20, "step": 2, "default": 8, "unit": "px" },
+    { "type": "range", "id": "badge_left",    "label": "Badge position — left", "min": 4, "max": 20, "step": 2, "default": 8, "unit": "px" },
+    {
+      "type": "header",
+      "content": "Section Spacing"
+    },
+    { "type": "color", "id": "section_bg",   "label": "Section background",   "default": "#ffffff" },
+    { "type": "range", "id": "pad_top",      "label": "Padding top",          "min": 0,  "max": 60, "step": 4, "default": 24, "unit": "px" },
+    { "type": "range", "id": "pad_bottom",   "label": "Padding bottom",       "min": 0,  "max": 60, "step": 4, "default": 24, "unit": "px" },
+    { "type": "range", "id": "side_pad",     "label": "Side padding",         "min": 8,  "max": 48, "step": 4, "default": 20, "unit": "px" },
+    { "type": "range", "id": "scroll_pb",    "label": "Scroll area bottom pad","min": 0, "max": 24, "step": 4, "default": 8,  "unit": "px" }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Category Card",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "Card auto-uses: collection title as label, collection image, and collection page link. Manage at Products → Collections."
+        },
+        {
+          "type": "header",
+          "content": "Override (leave blank = auto)"
+        },
+        { "type": "text",         "id": "label",    "label": "Custom label",          "info": "Leave blank to use collection title" },
+        { "type": "text",         "id": "subtitle", "label": "Custom subtitle",        "info": "Leave blank to use collection description" },
+        { "type": "image_picker", "id": "image",    "label": "Custom image",           "info": "Leave blank to use collection image automatically" },
+        { "type": "url",          "id": "link",     "label": "Custom URL",             "info": "Leave blank to link to collection page" },
+        { "type": "text",         "id": "emoji",    "label": "Emoji (if no image)",    "default": "📦" },
+        {
+          "type": "header",
+          "content": "Badge"
+        },
+        { "type": "text",  "id": "badge",      "label": "Badge text",       "info": "e.g. NEW, HOT, 20% OFF. Leave blank for no badge." },
+        { "type": "color", "id": "badge_bg",   "label": "Badge background", "default": "#F5A623" },
+        { "type": "color", "id": "badge_text", "label": "Badge text color", "default": "#111111" }
+      ]
+    },
+    { "type": "@app" }
+  ],
+  "presets": [
+    {
+      "name": "Category Strip",
+      "settings": {
+        "title": "Shop by Category",
+        "card_width": 160,
+        "img_height": 150,
+        "label_position": "below",
+        "show_count": true,
+        "show_shadow": true
+      }
+    }
+  ]
+}
+{% endschema %}

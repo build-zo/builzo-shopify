@@ -1,0 +1,164 @@
+{% comment %}FILE: sections/bz-track-order.liquid{% endcomment %}
+
+<section class="bz-section bz-track" data-section-id="{{ section.id }}" style="background:{{ section.settings.bg_color | default: '#F5F5F5' }};">
+  <div class="bz-inner" style="padding:48px var(--bz-pad-h);">
+    <div class="bz-track__card">
+
+      <h1 class="bz-track__title">{{ section.settings.title | default: 'Track Your Order' }}</h1>
+      <p class="bz-track__desc">{{ section.settings.description | default: 'Enter your order ID to track delivery status.' }}</p>
+
+      <div class="bz-track__form">
+        <input type="text" id="bzTrackInput" class="bz-input" placeholder="{{ section.settings.placeholder | default: 'Enter your Order ID' }}" />
+        <button type="button" id="bzTrackBtn" class="bz-btn bz-btn--primary" style="flex-shrink:0;">
+          {{ section.settings.btn_label | default: 'Track' }}
+        </button>
+      </div>
+
+      <!-- Demo order status (replace with real order lookup if needed) -->
+      <div class="bz-track__status" id="bzTrackStatus" hidden>
+        <div class="bz-track__steps">
+          <div class="bz-track__step" data-step="confirmed">
+            <div class="bz-track__step-dot"></div>
+            <div class="bz-track__step-info">
+              <p class="bz-track__step-label">{{ section.settings.step1_label | default: 'Order Confirmed' }}</p>
+              <p class="bz-track__step-time" id="bzStep1Time"></p>
+            </div>
+          </div>
+          <div class="bz-track__step" data-step="preparing">
+            <div class="bz-track__step-dot"></div>
+            <div class="bz-track__step-info">
+              <p class="bz-track__step-label">{{ section.settings.step2_label | default: 'Preparing' }}</p>
+              <p class="bz-track__step-time" id="bzStep2Time"></p>
+            </div>
+          </div>
+          <div class="bz-track__step" data-step="out">
+            <div class="bz-track__step-dot"></div>
+            <div class="bz-track__step-info">
+              <p class="bz-track__step-label">{{ section.settings.step3_label | default: 'Out for Delivery' }}</p>
+              <p class="bz-track__step-time" id="bzStep3Time"></p>
+            </div>
+          </div>
+          <div class="bz-track__step" data-step="delivered">
+            <div class="bz-track__step-dot"></div>
+            <div class="bz-track__step-info">
+              <p class="bz-track__step-label">{{ section.settings.step4_label | default: 'Delivered' }}</p>
+              <p class="bz-track__step-time" id="bzStep4Time"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bz-track__note" style="margin-top:24px;padding:14px;background:var(--bz-yellow-light);border-radius:var(--bz-radius-md);font-size:var(--bz-font-sm);color:var(--bz-yellow-dark);">
+        {{ section.settings.whatsapp_note | default: '📱 For real-time updates, we send order status on WhatsApp. Please ensure you have WhatsApp installed.' }}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .bz-track__card {
+    max-width: 520px;
+    margin: 0 auto;
+    background: var(--bz-white);
+    border-radius: var(--bz-radius-xl);
+    padding: 36px 32px;
+    box-shadow: var(--bz-shadow-md);
+  }
+  .bz-track__title { font-size: var(--bz-font-2xl); font-weight: 800; color: var(--bz-black); margin: 0 0 8px; }
+  .bz-track__desc { font-size: var(--bz-font-base); color: var(--bz-gray); margin: 0 0 24px; }
+  .bz-track__form { display: flex; gap: 10px; }
+  .bz-track__form .bz-input { flex: 1; }
+
+  .bz-track__status { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--bz-border); }
+  .bz-track__steps { display: flex; flex-direction: column; gap: 0; position: relative; }
+  .bz-track__steps::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 12px;
+    bottom: 12px;
+    width: 2px;
+    background: var(--bz-border);
+    z-index: 0;
+  }
+  .bz-track__step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 0;
+    position: relative;
+    z-index: 1;
+  }
+  .bz-track__step-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--bz-border);
+    border: 3px solid var(--bz-white);
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .bz-track__step.active .bz-track__step-dot { background: var(--bz-yellow); box-shadow: 0 0 0 3px rgba(245,166,35,0.25); }
+  .bz-track__step.done .bz-track__step-dot { background: var(--bz-green); }
+  .bz-track__step-label { font-size: var(--bz-font-base); font-weight: 600; color: var(--bz-gray); margin: 2px 0 0; }
+  .bz-track__step.active .bz-track__step-label,
+  .bz-track__step.done .bz-track__step-label { color: var(--bz-black); }
+  .bz-track__step-time { font-size: var(--bz-font-xs); color: var(--bz-gray); margin: 2px 0 0; }
+</style>
+
+<script>
+(function() {
+  var input  = document.getElementById('bzTrackInput');
+  var btn    = document.getElementById('bzTrackBtn');
+  var status = document.getElementById('bzTrackStatus');
+
+  if (!btn) return;
+
+  btn.addEventListener('click', function() {
+    var orderId = input ? input.value.trim() : '';
+    if (!orderId) return;
+
+    /* Show demo tracking steps */
+    status.hidden = false;
+    var now = new Date();
+    var steps = ['bzStep1Time','bzStep2Time','bzStep3Time','bzStep4Time'];
+    var stepEls = document.querySelectorAll('.bz-track__step');
+
+    steps.forEach(function(id, i) {
+      var el = document.getElementById(id);
+      var t = new Date(now.getTime() - (3-i) * 15 * 60000);
+      if (el && i < 2) el.textContent = t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    });
+
+    stepEls.forEach(function(el, i) {
+      el.classList.remove('active','done');
+      if (i < 1) el.classList.add('done');
+      if (i === 1) el.classList.add('active');
+    });
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Track Order",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "default": "Track Your Order" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Enter your order ID to track delivery status." },
+    { "type": "text", "id": "placeholder", "label": "Input placeholder", "default": "Enter your Order ID" },
+    { "type": "text", "id": "btn_label", "label": "Button text", "default": "Track" },
+    { "type": "header", "content": "Step Labels" },
+    { "type": "text", "id": "step1_label", "label": "Step 1", "default": "Order Confirmed" },
+    { "type": "text", "id": "step2_label", "label": "Step 2", "default": "Preparing" },
+    { "type": "text", "id": "step3_label", "label": "Step 3", "default": "Out for Delivery" },
+    { "type": "text", "id": "step4_label", "label": "Step 4", "default": "Delivered" },
+    { "type": "header", "content": "WhatsApp Note" },
+    { "type": "textarea", "id": "whatsapp_note", "label": "Note text", "default": "📱 For real-time updates, we send order status on WhatsApp." },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#F5F5F5" }
+  ],
+  "blocks": [{ "type": "@app" }],
+  "presets": [{ "name": "Track Order" }]
+}
+{% endschema %}

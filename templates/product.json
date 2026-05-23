@@ -1,0 +1,168 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "product-template",
+      "blocks": {
+        "usp1": {
+          "type": "usp",
+          "settings": {
+            "icon": "✅",
+            "text": "100% Genuine Product"
+          }
+        },
+        "usp2": {
+          "type": "usp",
+          "settings": {
+            "icon": "🚚",
+            "text": "60-90 Min Delivery"
+          }
+        },
+        "usp3": {
+          "type": "usp",
+          "settings": {
+            "icon": "↩️",
+            "text": "Easy Returns"
+          }
+        },
+        "acc1": {
+          "type": "accordion",
+          "settings": {
+            "title": "Product Highlights",
+            "source": "metafield",
+            "content": "<p>Add your product highlights here.</p>",
+            "metafield_key": "custom.highlights",
+            "open_by_default": true
+          }
+        },
+        "acc2": {
+          "type": "accordion",
+          "settings": {
+            "title": "Product Description",
+            "source": "description",
+            "content": "<p>Add your product highlights here.</p>",
+            "metafield_key": "",
+            "open_by_default": false
+          }
+        },
+        "acc3": {
+          "type": "accordion",
+          "settings": {
+            "title": "FAQs",
+            "source": "metafield",
+            "content": "<p>Add your product highlights here.</p>",
+            "metafield_key": "custom.faqs",
+            "open_by_default": false
+          }
+        },
+        "acc4": {
+          "type": "accordion",
+          "settings": {
+            "title": "Returns & Exchange Policy",
+            "source": "custom",
+            "content": "<p>Easy 7-day returns. Contact us on WhatsApp for hassle-free returns and exchanges.</p>",
+            "metafield_key": "",
+            "open_by_default": false
+          }
+        }
+      },
+      "block_order": [
+        "usp1",
+        "usp2",
+        "usp3",
+        "acc1",
+        "acc2",
+        "acc3",
+        "acc4"
+      ],
+      "settings": {
+        "accent_color": "#f5a623",
+        "body_bg": "#ffffff",
+        "badge_bg": "#f5a623",
+        "badge_text_color": "#111111",
+        "in_stock_color": "#22c55e",
+        "oos_color": "#ef4444",
+        "title_size": 28,
+        "title_color": "#111111",
+        "title_weight": "700",
+        "price_size": 26,
+        "price_color": "#111111",
+        "compare_price_color": "#999999",
+        "label_size": 13,
+        "label_color": "#555555",
+        "btn_bg": "#f5a623",
+        "btn_text_color": "#111111",
+        "btn_size": 16,
+        "btn_height": 52,
+        "btn_radius": 10,
+        "atc_text": "Add to cart",
+        "oos_btn_text": "Out of stock",
+        "variant_border": "#e2e2e2",
+        "variant_selected_bg": "#f5a623",
+        "variant_selected_text": "#111111",
+        "variant_radius": 8,
+        "qty_label": "Quantity",
+        "img_bg": "#f9f9f9",
+        "img_box_height": 440,
+        "img_box_width": 100,
+        "img_radius": 16,
+        "img_padding": 20,
+        "img_fit": "contain",
+        "arrow_bg": "#ffffff",
+        "arrow_color": "#111111",
+        "arrow_size": 40,
+        "arrow_radius": 50,
+        "arrow_shadow": "0 2px 8px rgba(0,0,0,0.15)",
+        "show_thumbs": true,
+        "thumb_size": 72,
+        "thumb_radius": 8,
+        "show_dots": true,
+        "show_delivery": true,
+        "delivery_prefix": "Delivery in",
+        "default_delivery": "60-90 min",
+        "show_whatsapp_btn": true,
+        "whatsapp_number": "918729022552",
+        "wa_btn_text": "Buy on WhatsApp",
+        "wa_message": "Hi! I want to order:",
+        "show_bulk_price": true,
+        "bulk_price_url": "",
+        "bulk_price_text": "",
+        "show_tax_note": true,
+        "tax_note_size": 12,
+        "shipping_link_text": "Shipping",
+        "shipping_link_url": "shopify://pages/shipping-policy",
+        "shipping_note": "calculated at checkout.",
+        "usp_bg": "#f9f9f9",
+        "usp_size": 12,
+        "usp_color": "#444444",
+        "usp_radius": 10,
+        "accordion_border": "#e8e8e8",
+        "accordion_title_size": 15,
+        "accordion_title_color": "#111111",
+        "accordion_title_weight": "600",
+        "accordion_body_size": 14,
+        "accordion_body_color": "#444444",
+        "show_breadcrumb": true,
+        "breadcrumb_size": 12,
+        "show_vendor": true,
+        "vendor_size": 12,
+        "in_stock_text": "IN STOCK",
+        "oos_text": "OUT OF STOCK",
+        "layout_gap": 48,
+        "pad_v": 24,
+        "pad_h": 24
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

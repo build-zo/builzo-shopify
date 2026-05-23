@@ -1,0 +1,157 @@
+{% comment %}FILE: sections/bz-pincode-page.liquid{% endcomment %}
+
+<section class="bz-section bz-pincode-page" data-section-id="{{ section.id }}" style="background:{{ section.settings.bg_color | default: '#F5F5F5' }};">
+  <div class="bz-inner" style="padding:48px var(--bz-pad-h);">
+    <div class="bz-pincode-page__card">
+
+      {%- if section.settings.image != blank -%}
+        <div style="text-align:center;margin-bottom:24px;">
+          <img src="{{ section.settings.image | image_url: width: 200 }}" alt="" width="200" height="160" loading="lazy" style="max-height:160px;width:auto;object-fit:contain;margin:0 auto;" />
+        </div>
+      {%- endif -%}
+
+      <h1 class="bz-pincode-page__title">{{ section.settings.title | default: 'Check Delivery Availability' }}</h1>
+      <p class="bz-pincode-page__desc">{{ section.settings.description | default: 'We deliver only in select areas. Enter your pincode to check.' }}</p>
+
+      <div class="bz-pincode-page__form">
+        <input
+          type="text"
+          id="bzPincodePage"
+          class="bz-input bz-pincode-page__input"
+          placeholder="{{ section.settings.placeholder | default: 'Enter 6-digit pincode' }}"
+          maxlength="6"
+          inputmode="numeric"
+          autocomplete="postal-code"
+        />
+        <button type="button" id="bzPincodePageBtn" class="bz-btn bz-btn--primary bz-btn--lg" style="width:100%;margin-top:10px;">
+          {{ section.settings.btn_label | default: 'Check Delivery' }}
+        </button>
+      </div>
+
+      <div class="bz-pincode-page__result" id="bzPincodePageResult" hidden>
+        <div class="bz-pincode-page__result-inner" id="bzPincodePageResultInner"></div>
+      </div>
+
+      <!-- Serviceable areas list -->
+      {%- if section.settings.show_areas_list -%}
+        <div class="bz-pincode-page__areas">
+          <p class="bz-pincode-page__areas-title">{{ section.settings.areas_title | default: 'We currently deliver to:' }}</p>
+          <div class="bz-pincode-page__areas-grid" id="bzPincodeAreasList"></div>
+        </div>
+      {%- endif -%}
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .bz-pincode-page__card {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--bz-white);
+    border-radius: var(--bz-radius-xl);
+    padding: 36px 32px;
+    box-shadow: var(--bz-shadow-md);
+    text-align: center;
+  }
+  .bz-pincode-page__title {
+    font-size: var(--bz-font-2xl);
+    font-weight: 800;
+    color: var(--bz-black);
+    margin: 0 0 10px;
+  }
+  .bz-pincode-page__desc {
+    font-size: var(--bz-font-base);
+    color: var(--bz-gray);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+  .bz-pincode-page__form { display: flex; flex-direction: column; gap: 0; }
+  .bz-pincode-page__input { text-align: center; font-size: 20px; letter-spacing: 0.1em; font-weight: 600; height: 56px; }
+
+  .bz-pincode-page__result { margin-top: 20px; }
+  .bz-pincode-page__result-inner {
+    padding: 14px 20px;
+    border-radius: var(--bz-radius-md);
+    font-size: var(--bz-font-base);
+    font-weight: 500;
+    text-align: center;
+  }
+  .bz-pincode-page__result-inner.success { background: #dcfce7; color: #16a34a; }
+  .bz-pincode-page__result-inner.error   { background: #fee2e2; color: #dc2626; }
+
+  .bz-pincode-page__areas { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--bz-border); }
+  .bz-pincode-page__areas-title { font-size: var(--bz-font-sm); font-weight: 600; color: var(--bz-gray); margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .bz-pincode-page__areas-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .bz-pincode-page__area-pill { background: var(--bz-yellow-light); color: var(--bz-yellow-dark); border-radius: 999px; padding: 4px 12px; font-size: var(--bz-font-sm); font-weight: 600; }
+</style>
+
+<script>
+(function() {
+  var input   = document.getElementById('bzPincodePage');
+  var btn     = document.getElementById('bzPincodePageBtn');
+  var result  = document.getElementById('bzPincodePageResult');
+  var inner   = document.getElementById('bzPincodePageResultInner');
+  var list    = document.getElementById('bzPincodeAreasList');
+
+  /* Populate areas list from map */
+  if (list && window.QCDeliveryMap) {
+    Object.keys(window.QCDeliveryMap).forEach(function(pin) {
+      var info = window.QCDeliveryMap[pin];
+      var pill = document.createElement('span');
+      pill.className = 'bz-pincode-page__area-pill';
+      pill.textContent = info.area + ' (' + pin + ')';
+      list.appendChild(pill);
+    });
+  }
+
+  if (!btn || !input) return;
+
+  if (input) input.addEventListener('input', function() { this.value = this.value.replace(/\D/g,''); });
+  if (input) input.addEventListener('keydown', function(e) { if(e.key==='Enter') btn.click(); });
+
+  btn.addEventListener('click', function() {
+    var pin = input.value.trim();
+    if (pin.length !== 6) {
+      show('error', '⚠️ Please enter a valid 6-digit pincode');
+      return;
+    }
+    var map = window.QCDeliveryMap || {};
+    if (map[pin]) {
+      show('success', '✅ Great news! We deliver to <strong>' + esc(map[pin].area) + '</strong> in <strong>' + esc(map[pin].time) + '</strong>. <a href="/" style="color:inherit;text-decoration:underline;font-weight:700;">Shop Now →</a>');
+      /* Also save to pincode context */
+      if (window.QCPincode) window.QCPincode.set(pin, map[pin].area, map[pin].time, true);
+    } else {
+      show('error', '❌ Sorry, we don\'t deliver to pincode <strong>' + esc(pin) + '</strong> yet. We\'re expanding soon!');
+      if (window.QCPincode) window.QCPincode.set(pin, pin, null, false);
+    }
+  });
+
+  function show(type, html) {
+    result.hidden = false;
+    inner.className = 'bz-pincode-page__result-inner ' + type;
+    inner.innerHTML = html;
+  }
+
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Pincode Checker",
+  "tag": "section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Illustration image" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Check Delivery Availability" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "We deliver only in select areas. Enter your pincode to check." },
+    { "type": "text", "id": "placeholder", "label": "Input placeholder", "default": "Enter 6-digit pincode" },
+    { "type": "text", "id": "btn_label", "label": "Button text", "default": "Check Delivery" },
+    { "type": "checkbox", "id": "show_areas_list", "label": "Show serviceable areas list", "default": true },
+    { "type": "text", "id": "areas_title", "label": "Areas list title", "default": "We currently deliver to:" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#F5F5F5" }
+  ],
+  "blocks": [{ "type": "@app" }],
+  "presets": [{ "name": "Pincode Checker" }]
+}
+{% endschema %}

@@ -1,0 +1,38 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "header": {
+      "type": "header",
+      "settings": {
+        "accent_color": "#0f6e56",
+        "menu": "main-menu",
+        "search_placeholder": "Search for groceries...",
+        "default_pincode": "151001",
+        "default_area": "Barnala",
+        "default_delivery_time": "10 min",
+        "show_announcement": true,
+        "announcement_text": "Free delivery on orders above \u20b95,000",
+        "promo_code": ""
+      },
+      "block_order": ["pin1","pin2","pin3","pin4","pin5"],
+      "blocks": {
+        "pin1": { "type": "pincode", "settings": { "pincode": "151001", "area": "Barnala, Punjab", "time": "10 min" } },
+        "pin2": { "type": "pincode", "settings": { "pincode": "151002", "area": "Barnala, Punjab", "time": "10 min" } },
+        "pin3": { "type": "pincode", "settings": { "pincode": "151003", "area": "Barnala, Punjab", "time": "12 min" } },
+        "pin4": { "type": "pincode", "settings": { "pincode": "151004", "area": "Barnala, Punjab", "time": "12 min" } },
+        "pin5": { "type": "pincode", "settings": { "pincode": "151005", "area": "Barnala, Punjab", "time": "15 min" } }
+      }
+    }
+  },
+  "order": ["header"]
+}

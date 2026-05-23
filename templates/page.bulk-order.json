@@ -1,0 +1,41 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "bz-bulk-order",
+      "block_order": ["b1","b2","b3","b4","s1","s2","s3","s4"],
+      "blocks": {
+        "b1": { "type": "benefit", "settings": { "icon": "💰", "title": "Special Pricing",     "desc": "Exclusive rates on bulk quantities for contractors and builders." } },
+        "b2": { "type": "benefit", "settings": { "icon": "👤", "title": "Dedicated Manager",   "desc": "A dedicated relationship manager for all your orders." } },
+        "b3": { "type": "benefit", "settings": { "icon": "🧾", "title": "GST Invoice",         "desc": "Proper GST invoices for all bulk purchases." } },
+        "b4": { "type": "benefit", "settings": { "icon": "🚚", "title": "Priority Delivery",   "desc": "Your bulk orders are dispatched on priority." } },
+        "s1": { "type": "step", "settings": { "title": "Submit Your Requirement", "desc": "Fill the form or WhatsApp us with product names and quantities." } },
+        "s2": { "type": "step", "settings": { "title": "Get Best Quote",           "desc": "Our team shares the best price within 30 minutes." } },
+        "s3": { "type": "step", "settings": { "title": "Confirm & Pay",            "desc": "Confirm the order and pay via UPI or COD." } },
+        "s4": { "type": "step", "settings": { "title": "Fast Delivery",            "desc": "Materials delivered to your site on time." } }
+      },
+      "settings": {
+        "eyebrow": "FOR CONTRACTORS & BUILDERS",
+        "hero_title": "Better Prices for Big Builders",
+        "hero_desc": "Special pricing on bulk orders. Dedicated relationship manager. GST invoice guaranteed.",
+        "hero_bg": "#1A1A1A",
+        "benefits_title": "Bulk Order Benefits",
+        "steps_title": "How It Works",
+        "show_form": true,
+        "form_title": "Get a Custom Quote",
+        "form_desc": "Fill in the details and our team will contact you within 30 minutes.",
+        "submit_label": "Send Quote Request via WhatsApp",
+        "form_note": "✅ Our team will confirm and share pricing within 30 minutes."
+      }
+    }
+  },
+  "order": ["main"]
+}

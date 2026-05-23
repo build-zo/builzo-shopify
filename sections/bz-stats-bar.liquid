@@ -1,0 +1,86 @@
+{% comment %}FILE: sections/bz-stats-bar.liquid{% endcomment %}
+
+<section class="bz-section bz-stats-bar" data-section-id="{{ section.id }}" style="border-top: 3px solid var(--bz-yellow); background: {{ section.settings.bg_color | default: '#FFFFFF' }};">
+  <div class="bz-inner" style="padding-top:16px;padding-bottom:16px;">
+    <div class="bz-stats-bar__grid">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'stat' -%}
+          <div class="bz-stats-bar__item" {{ block.shopify_attributes }}>
+            <span class="bz-stats-bar__icon">{{ block.settings.icon }}</span>
+            <div>
+              <p class="bz-stats-bar__value">{{ block.settings.value }}</p>
+              <p class="bz-stats-bar__label">{{ block.settings.label }}</p>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .bz-stats-bar__grid {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .bz-stats-bar__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 120px;
+    max-width: 200px;
+  }
+  .bz-stats-bar__icon { font-size: 26px; flex-shrink: 0; }
+  .bz-stats-bar__value {
+    font-size: var(--bz-font-lg);
+    font-weight: 800;
+    color: var(--bz-black);
+    margin: 0;
+    line-height: 1;
+  }
+  .bz-stats-bar__label {
+    font-size: var(--bz-font-xs);
+    color: var(--bz-gray);
+    margin: 2px 0 0;
+    font-weight: 500;
+  }
+  @media (max-width: 600px) {
+    .bz-stats-bar__grid { justify-content: flex-start; gap: 12px; }
+    .bz-stats-bar__item { min-width: calc(50% - 12px); max-width: calc(50% - 12px); }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Stats Bar",
+  "tag": "section",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background color", "default": "#FFFFFF" }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Emoji icon", "default": "👷" },
+        { "type": "text", "id": "value", "label": "Value", "default": "5000+" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Happy Customers" }
+      ]
+    },
+    { "type": "@app" }
+  ],
+  "presets": [{
+    "name": "Stats Bar",
+    "blocks": [
+      { "type": "stat", "settings": { "icon": "👷", "value": "5000+", "label": "Happy Customers" } },
+      { "type": "stat", "settings": { "icon": "📦", "value": "50+", "label": "Product Categories" } },
+      { "type": "stat", "settings": { "icon": "✅", "value": "100%", "label": "Genuine Products" } },
+      { "type": "stat", "settings": { "icon": "🚚", "value": "On-time", "label": "Every Time" } }
+    ]
+  }]
+}
+{% endschema %}

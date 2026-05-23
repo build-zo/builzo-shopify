@@ -1,0 +1,443 @@
+{% comment %}
+  FILE: sections/header.liquid — Fully customizable header
+{% endcomment %}
+
+{%- liquid
+  assign accent          = section.settings.accent_color       | default: '#0f6e56'
+  assign header_bg       = section.settings.header_bg          | default: '#ffffff'
+  assign header_border   = section.settings.header_border      | default: '#e8e8e8'
+  assign header_height   = section.settings.header_height      | default: 64
+  assign logo_width      = section.settings.logo_width         | default: 140
+  assign logo_height     = section.settings.logo_height        | default: 44
+  assign store_name_size = section.settings.store_name_size    | default: 18
+  assign store_name_color = section.settings.store_name_color  | default: '#1a1a1a'
+  assign store_name_weight = section.settings.store_name_weight | default: '600'
+  assign search_bg       = section.settings.search_bg          | default: '#f8f8f6'
+  assign search_border   = section.settings.search_border      | default: '#e2e2e2'
+  assign search_text     = section.settings.search_text        | default: '#1a1a1a'
+  assign search_height   = section.settings.search_height      | default: 40
+  assign search_radius   = section.settings.search_radius      | default: 8
+  assign search_font     = section.settings.search_font_size   | default: 14
+  assign icon_size       = section.settings.icon_size          | default: 22
+  assign icon_color      = section.settings.icon_color         | default: '#555555'
+  assign icon_hover_bg   = section.settings.icon_hover_bg      | default: '#f2f2f0'
+  assign pincode_bg      = section.settings.pincode_bg         | default: '#f8f8f6'
+  assign pincode_border  = section.settings.pincode_border     | default: '#e2e2e2'
+  assign pincode_label_color = section.settings.pincode_label_color | default: '#888888'
+  assign pincode_value_color = section.settings.pincode_value_color | default: '#1a1a1a'
+  assign pincode_radius  = section.settings.pincode_radius     | default: 8
+  assign badge_text_color = section.settings.badge_text_color  | default: accent
+  assign ann_bg          = section.settings.ann_bg             | default: accent
+  assign ann_text_color  = section.settings.ann_text_color     | default: '#ffffff'
+  assign ann_font_size   = section.settings.ann_font_size      | default: 12
+  assign ann_height      = section.settings.ann_height         | default: 32
+  assign nav_bg          = section.settings.nav_bg             | default: '#ffffff'
+  assign nav_border      = section.settings.nav_border         | default: '#ebebeb'
+  assign nav_height      = section.settings.nav_height         | default: 42
+  assign nav_link_color  = section.settings.nav_link_color     | default: '#666666'
+  assign nav_active_color = section.settings.nav_active_color  | default: accent
+  assign nav_font_size   = section.settings.nav_font_size      | default: 13
+  assign nav_font_weight = section.settings.nav_font_weight    | default: '400'
+  assign nav_active_weight = section.settings.nav_active_weight | default: '600'
+  assign main_menu       = section.settings.menu
+  assign show_ann        = section.settings.show_announcement
+  assign show_search     = section.settings.show_search
+  assign show_account    = section.settings.show_account
+  assign show_pincode    = section.settings.show_pincode
+  assign show_nav        = section.settings.show_nav
+  assign default_pincode = section.settings.default_pincode
+  assign default_area    = section.settings.default_area
+  assign default_time    = section.settings.default_delivery_time
+-%}
+
+<link rel="stylesheet" href="{{ 'header.css' | asset_url }}" />
+
+<!-- Inline overrides from Theme Editor -->
+<style>
+  .qc-header-wrapper { background: {{ header_bg }}; border-bottom: 1px solid {{ header_border }}; }
+  .qc-header         { height: {{ header_height }}px; background: {{ header_bg }}; }
+  @media (max-width: 768px) { .qc-header { height: auto !important; } }
+  .qc-top-bar        { background: {{ ann_bg }}; min-height: {{ ann_height }}px; }
+  .qc-top-bar__text  { color: {{ ann_text_color }}; font-size: {{ ann_font_size }}px; }
+  .qc-logo__name     { font-size: {{ store_name_size }}px; font-weight: {{ store_name_weight }}; color: {{ store_name_color }}; }
+  .qc-logo__icon     { background: {{ accent }}; }
+  .qc-search__input  {
+    height: {{ search_height }}px;
+    background: {{ search_bg }};
+    border-color: {{ search_border }};
+    color: {{ search_text }};
+    font-size: {{ search_font }}px;
+    border-radius: {{ search_radius }}px;
+  }
+  .qc-search__input:focus { border-color: {{ accent }}; background: {{ header_bg }}; }
+  .qc-action-btn     { color: {{ icon_color }}; }
+  .qc-action-btn:hover { background: {{ icon_hover_bg }}; }
+  .qc-action-btn svg { width: {{ icon_size }}px; height: {{ icon_size }}px; }
+  .qc-cart-badge     { background: {{ accent }} !important; }
+  .qc-pincode-trigger {
+    background: {{ pincode_bg }};
+    border-color: {{ pincode_border }};
+    border-radius: {{ pincode_radius }}px;
+  }
+  .qc-pincode-trigger:hover { border-color: {{ accent }}; }
+  .qc-pincode-trigger__label { color: {{ pincode_label_color }}; }
+  .qc-pincode-trigger__value { color: {{ pincode_value_color }}; }
+  .qc-delivery-badge { color: {{ badge_text_color }}; background: {{ badge_text_color }}1a; }
+  .qc-nav            { background: {{ nav_bg }}; border-top-color: {{ nav_border }}; }
+  .qc-nav__link      {
+    color: {{ nav_link_color }};
+    font-size: {{ nav_font_size }}px;
+    font-weight: {{ nav_font_weight }};
+    height: {{ nav_height }}px;
+    --accent: {{ nav_active_color }};
+  }  .qc-nav__link:hover { color: {{ store_name_color }}; }
+  .qc-nav__link--active,
+  .qc-nav__link[aria-current="page"] {
+    color: {{ nav_active_color }};
+    border-bottom-color: {{ nav_active_color }};
+    font-weight: {{ nav_active_weight }};
+  }
+  .qc-modal__submit { background: {{ accent }} !important; }
+</style>
+
+<div class="qc-header-wrapper" data-header>
+
+  <!-- ── ANNOUNCEMENT BAR ── -->
+  {%- if show_ann -%}
+  <div class="qc-top-bar">
+    <p class="qc-top-bar__text">
+      ⚡ {{ section.settings.announcement_text }}
+      {%- if section.settings.promo_code != blank -%}
+        &nbsp;·&nbsp; Use code <strong>{{ section.settings.promo_code }}</strong>
+      {%- endif -%}
+    </p>
+  </div>
+  {%- endif -%}
+
+  <header class="qc-header" role="banner">
+
+    <!-- ── LOGO ── -->
+    <div class="qc-header__logo">
+      <a href="{{ routes.root_url }}" class="qc-logo" aria-label="{{ shop.name }} home">
+        {%- if section.settings.logo != blank -%}
+          <img
+            src="{{ section.settings.logo | image_url: width: 400 }}"
+            alt="{{ shop.name }}"
+            width="{{ logo_width }}"
+            height="{{ logo_height }}"
+            loading="eager"
+            class="qc-logo__img"
+            style="width:{{ logo_width }}px; height:{{ logo_height }}px; object-fit:{{ section.settings.logo_fit | default: 'contain' }};"
+          />
+        {%- else -%}
+          <div class="qc-logo__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <span class="qc-logo__name">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+    <!-- ── PINCODE ── -->
+    {%- if show_pincode -%}
+    <button
+      class="qc-pincode-trigger"
+      id="qcPincodeBtn"
+      aria-haspopup="dialog"
+      aria-expanded="false"
+      aria-controls="qcPincodeModal"
+      type="button"
+    >
+      <svg class="qc-pincode-trigger__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{ accent }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span class="qc-pincode-trigger__content">
+        <span class="qc-pincode-trigger__label" style="font-size:{{ section.settings.pincode_label_size | default: 10 }}px;">{{ section.settings.deliver_to_label | default: 'Deliver to' }}</span>
+        <span
+          class="qc-pincode-trigger__value"
+          id="qcPincodeDisplay"
+          data-default-pin="{{ default_pincode }}"
+          data-default-area="{{ default_area }}"
+          style="font-size:{{ section.settings.pincode_value_size | default: 13 }}px;"
+        >{{ default_pincode }}{%- if default_area != blank -%}, {{ default_area }}{%- endif -%}</span>
+      </span>
+      <span
+        class="qc-delivery-badge"
+        id="qcDeliveryBadge"
+        data-default-time="{{ default_time }}"
+        style="font-size:{{ section.settings.badge_font_size | default: 11 }}px;"
+      >⚡ {{ default_time }}</span>
+    </button>
+    {%- endif -%}
+
+    <!-- ── SEARCH ── -->
+    {%- if show_search -%}
+    <div class="qc-search" role="search">
+      <form action="{{ routes.search_url }}" method="get" class="qc-search__form">
+        <input type="hidden" name="type" value="product" />
+        <label for="qcSearchInput" class="visually-hidden">Search products</label>
+        <input
+          id="qcSearchInput"
+          class="qc-search__input"
+          type="search"
+          name="q"
+          placeholder="{{ section.settings.search_placeholder | default: 'Search for construction materials...' }}"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        />
+        <button type="submit" class="qc-search__btn" aria-label="Search" style="color:{{ icon_color }};">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+      </form>
+    </div>
+    {%- endif -%}
+
+    <!-- ── ACTIONS ── -->
+    <div class="qc-header__actions">
+      {%- if show_account -%}
+      <a href="{{ routes.account_url }}" class="qc-action-btn" aria-label="Account">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      {%- endif -%}
+      <a href="{{ routes.cart_url }}" class="qc-action-btn qc-cart-btn" aria-label="Cart ({{ cart.item_count }} items)">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        {%- if cart.item_count > 0 -%}
+          <span class="qc-cart-badge" aria-hidden="true">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+  </header>
+
+  <!-- ── CATEGORY NAV ── -->
+  {%- if show_nav and main_menu != blank -%}
+  <nav class="qc-nav" aria-label="Product categories">
+    <ul class="qc-nav__list" role="list">
+      {%- for link in linklists[main_menu].links -%}
+        <li class="qc-nav__item">
+          <a
+            href="{{ link.url }}"
+            class="qc-nav__link{% if link.active %} qc-nav__link--active{% endif %}"
+            {% if link.active %}aria-current="page"{% endif %}
+          >
+            {{ link.title }}
+            {%- if link.title contains 'New' or link.title contains 'new' -%}
+              <span class="qc-nav__pill" style="background:{{ accent }}1a;color:{{ accent }};">New</span>
+            {%- elsif link.title contains 'Hot' or link.title contains 'hot' -%}
+              <span class="qc-nav__pill" style="background:#fee2e2;color:#dc2626;">Hot</span>
+            {%- endif -%}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+  {%- endif -%}
+
+</div>
+
+<!-- ── PINCODE MODAL ── -->
+<div class="qc-modal-overlay" id="qcPincodeModal" role="dialog" aria-modal="true" aria-label="Change delivery location" hidden>
+  <div class="qc-modal" role="document" style="border-radius:{{ section.settings.modal_radius | default: 12 }}px;">
+    <button class="qc-modal__close" id="qcModalClose" aria-label="Close dialog" type="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h2 class="qc-modal__title">{{ section.settings.modal_title | default: 'Enter your pincode' }}</h2>
+    <p class="qc-modal__desc">{{ section.settings.modal_desc | default: "We'll show delivery time and available products for your area." }}</p>
+    <div class="qc-modal__row">
+      <label for="qcPincodeInput" class="visually-hidden">Enter pincode</label>
+      <input type="text" id="qcPincodeInput" class="qc-modal__input" placeholder="{{ section.settings.modal_placeholder | default: 'e.g. 151001' }}" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" autocomplete="postal-code" />
+      <button type="button" class="qc-modal__submit" id="qcPincodeCheck">{{ section.settings.modal_btn | default: 'Check' }}</button>
+    </div>
+    <div class="qc-modal__result" id="qcDeliveryResult" hidden aria-live="polite">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ accent }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span class="qc-modal__result-text" id="qcDeliveryText"></span>
+    </div>
+    <p class="qc-modal__note" id="qcPincodeError" hidden role="alert">Please enter a valid 6-digit pincode.</p>
+  </div>
+</div>
+
+<!-- Pincode map -->
+<script>
+window.QCDeliveryMap = {
+  {%- assign is_first = true -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'pincode' -%}
+      {%- assign pin  = block.settings.pincode | strip -%}
+      {%- assign area = block.settings.area    | strip -%}
+      {%- assign time = block.settings.time    | strip -%}
+      {%- if pin != blank -%}
+        {%- unless is_first -%},{%- endunless -%}
+        "{{ pin }}":{"area":"{{ area | escape }}","time":"{{ time | escape }}"}
+        {%- assign is_first = false -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+};
+</script>
+<script src="{{ 'header.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "section",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    { "type": "image_picker", "id": "logo",              "label": "Logo image",              "info": "Leave blank to show store name as text" },
+    { "type": "range",        "id": "logo_width",        "label": "Logo width",              "min": 40,  "max": 320, "step": 10, "default": 140, "unit": "px" },
+    { "type": "range",        "id": "logo_height",       "label": "Logo height",             "min": 20,  "max": 100, "step": 2,  "default": 44,  "unit": "px" },
+    {
+      "type": "select",
+      "id": "logo_fit",
+      "label": "Logo image fit",
+      "options": [
+        { "value": "contain", "label": "Contain (show full logo)" },
+        { "value": "cover",   "label": "Cover (fill area)" },
+        { "value": "fill",    "label": "Stretch" }
+      ],
+      "default": "contain"
+    },
+    {
+      "type": "header",
+      "content": "Store Name (if no logo)"
+    },
+    { "type": "range",  "id": "store_name_size",   "label": "Store name font size",   "min": 12, "max": 36, "step": 1, "default": 18, "unit": "px" },
+    { "type": "color",  "id": "store_name_color",  "label": "Store name color",        "default": "#1a1a1a" },
+    {
+      "type": "select",
+      "id": "store_name_weight",
+      "label": "Store name font weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" },
+        { "value": "800", "label": "Extra Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "header",
+      "content": "Header Bar"
+    },
+    { "type": "color", "id": "header_bg",     "label": "Header background",    "default": "#ffffff" },
+    { "type": "color", "id": "header_border", "label": "Header bottom border",  "default": "#e8e8e8" },
+    { "type": "range", "id": "header_height", "label": "Header height",         "min": 48, "max": 100, "step": 2, "default": 64, "unit": "px" },
+    {
+      "type": "header",
+      "content": "Brand Accent"
+    },
+    { "type": "color", "id": "accent_color", "label": "Brand accent color", "default": "#0f6e56", "info": "Used for active states, badges, and highlights" },
+    {
+      "type": "header",
+      "content": "Search Bar"
+    },
+    { "type": "checkbox", "id": "show_search",      "label": "Show search bar",         "default": true },
+    { "type": "text",     "id": "search_placeholder","label": "Placeholder text",        "default": "Search for construction materials..." },
+    { "type": "color",    "id": "search_bg",         "label": "Search background",       "default": "#f8f8f6" },
+    { "type": "color",    "id": "search_border",     "label": "Search border color",     "default": "#e2e2e2" },
+    { "type": "color",    "id": "search_text",       "label": "Search text color",       "default": "#1a1a1a" },
+    { "type": "range",    "id": "search_height",     "label": "Search bar height",       "min": 32, "max": 60, "step": 2, "default": 40, "unit": "px" },
+    { "type": "range",    "id": "search_radius",     "label": "Search corner radius",    "min": 0,  "max": 30, "step": 2, "default": 8,  "unit": "px" },
+    { "type": "range",    "id": "search_font_size",  "label": "Search font size",        "min": 11, "max": 18, "step": 1, "default": 14, "unit": "px" },
+    {
+      "type": "header",
+      "content": "Icons (Cart & Account)"
+    },
+    { "type": "checkbox", "id": "show_account",   "label": "Show account icon",     "default": true },
+    { "type": "color",    "id": "icon_color",     "label": "Icon color",             "default": "#555555" },
+    { "type": "color",    "id": "icon_hover_bg",  "label": "Icon hover background",  "default": "#f2f2f0" },
+    { "type": "range",    "id": "icon_size",      "label": "Icon size",              "min": 16, "max": 32, "step": 2, "default": 22, "unit": "px" },
+    {
+      "type": "header",
+      "content": "Pincode Selector"
+    },
+    { "type": "checkbox", "id": "show_pincode",          "label": "Show pincode selector",     "default": true },
+    { "type": "text",     "id": "deliver_to_label",      "label": "Deliver to label",           "default": "Deliver to" },
+    { "type": "color",    "id": "pincode_bg",            "label": "Background color",           "default": "#f8f8f6" },
+    { "type": "color",    "id": "pincode_border",        "label": "Border color",               "default": "#e2e2e2" },
+    { "type": "color",    "id": "pincode_label_color",   "label": "Label text color",           "default": "#888888" },
+    { "type": "color",    "id": "pincode_value_color",   "label": "Value text color",           "default": "#1a1a1a" },
+    { "type": "range",    "id": "pincode_radius",        "label": "Corner radius",              "min": 0, "max": 20, "step": 2, "default": 8, "unit": "px" },
+    { "type": "range",    "id": "pincode_label_size",    "label": "Label font size",            "min": 8, "max": 14, "step": 1, "default": 10, "unit": "px" },
+    { "type": "range",    "id": "pincode_value_size",    "label": "Value font size",            "min": 10, "max": 18, "step": 1, "default": 13, "unit": "px" },
+    { "type": "color",    "id": "badge_text_color",      "label": "Delivery badge color",       "default": "#0f6e56" },
+    { "type": "range",    "id": "badge_font_size",       "label": "Delivery badge font size",   "min": 8, "max": 14, "step": 1, "default": 11, "unit": "px" },
+    {
+      "type": "header",
+      "content": "Category Nav Bar"
+    },
+    { "type": "checkbox", "id": "show_nav",           "label": "Show category nav bar",  "default": true },
+    { "type": "link_list","id": "menu",               "label": "Category menu",          "default": "main-menu" },
+    { "type": "color",    "id": "nav_bg",             "label": "Nav background",         "default": "#ffffff" },
+    { "type": "color",    "id": "nav_border",         "label": "Nav top border color",   "default": "#ebebeb" },
+    { "type": "range",    "id": "nav_height",         "label": "Nav bar height",         "min": 32, "max": 64, "step": 2, "default": 42, "unit": "px" },
+    { "type": "color",    "id": "nav_link_color",     "label": "Link color",             "default": "#666666" },
+    { "type": "color",    "id": "nav_active_color",   "label": "Active link color",      "default": "#0f6e56" },
+    { "type": "range",    "id": "nav_font_size",      "label": "Link font size",         "min": 11, "max": 18, "step": 1, "default": 13, "unit": "px" },
+    {
+      "type": "select",
+      "id": "nav_font_weight",
+      "label": "Link font weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "nav_active_weight",
+      "label": "Active link weight",
+      "options": [
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "header",
+      "content": "Announcement Bar"
+    },
+    { "type": "checkbox", "id": "show_announcement", "label": "Show announcement bar",  "default": true },
+    { "type": "color",    "id": "ann_bg",            "label": "Background color",       "default": "#0f6e56" },
+    { "type": "color",    "id": "ann_text_color",    "label": "Text color",             "default": "#ffffff" },
+    { "type": "range",    "id": "ann_font_size",     "label": "Font size",              "min": 10, "max": 16, "step": 1, "default": 12, "unit": "px" },
+    { "type": "range",    "id": "ann_height",        "label": "Bar height",             "min": 24, "max": 56, "step": 2, "default": 32, "unit": "px" },
+    { "type": "text",     "id": "announcement_text", "label": "Announcement text",      "default": "Fast delivery of construction materials — 60-90 minutes" },
+    { "type": "text",     "id": "promo_code",        "label": "Promo code (optional)",  "info": "Leave blank to hide" },
+    {
+      "type": "header",
+      "content": "Pincode Modal"
+    },
+    { "type": "range", "id": "modal_radius",     "label": "Modal corner radius",    "min": 0, "max": 24, "step": 2, "default": 12, "unit": "px" },
+    { "type": "text",  "id": "modal_title",      "label": "Modal title",            "default": "Enter your pincode" },
+    { "type": "text",  "id": "modal_desc",       "label": "Modal description",      "default": "We'll show delivery time and available products for your area." },
+    { "type": "text",  "id": "modal_placeholder","label": "Input placeholder",      "default": "e.g. 151001" },
+    { "type": "text",  "id": "modal_btn",        "label": "Check button text",      "default": "Check" },
+    {
+      "type": "header",
+      "content": "Delivery & Pincode Defaults"
+    },
+    { "type": "text", "id": "default_pincode",       "label": "Default pincode",       "default": "151001" },
+    { "type": "text", "id": "default_area",          "label": "Default area",          "default": "Barnala" },
+    { "type": "text", "id": "default_delivery_time", "label": "Default delivery time", "default": "60-90 min" }
+  ],
+  "blocks": [
+    {
+      "type": "pincode",
+      "name": "Serviceable Pincode",
+      "settings": [
+        { "type": "text", "id": "pincode", "label": "Pincode",       "default": "151001" },
+        { "type": "text", "id": "area",    "label": "Area name",     "default": "Barnala, Punjab" },
+        { "type": "text", "id": "time",    "label": "Delivery time", "default": "60-90 min" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Quick Commerce Header" }]
+}
+{% endschema %}

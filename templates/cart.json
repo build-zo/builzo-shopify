@@ -1,0 +1,48 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "cart-template",
+      "blocks": {
+        "selleasy_lb_upsell_widget_icuc_a9VpTV": {
+          "type": "shopify://apps/selleasy/blocks/lb-upsell-widget-icuc/790c1a03-a71f-4bc1-9869-00dad526d3c2",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "selleasy_lb_upsell_widget_icuc_a9VpTV"
+      ],
+      "settings": {
+        "title": "My Cart",
+        "checkout_label": "Proceed to Checkout",
+        "empty_title": "Your cart is empty",
+        "empty_desc": "Looks like you haven't added anything yet.",
+        "empty_btn_label": "Start Shopping",
+        "tier1_max": 1000,
+        "fee_tier1": 250,
+        "tier2_max": 5000,
+        "fee_tier2": 150,
+        "show_dynamic_checkout": true,
+        "show_app_slot": true,
+        "app_slot_label": "",
+        "show_gst_field": true,
+        "gst_label": "GST Number",
+        "gst_help_text": "Enter your 15-digit GSTIN for a GST invoice. Leave blank to skip.",
+        "show_cart_note": false,
+        "cart_note_label": "Order notes (optional)",
+        "cart_note_placeholder": "Special instructions..."
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
