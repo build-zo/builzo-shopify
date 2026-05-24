@@ -178,27 +178,127 @@
             "badge_bg": "#f5a623",
             "badge_text": "#111111"
           }
+        },
+        "card_FkkFDN": {
+          "type": "card",
+          "settings": {
+            "collection": "water-proofing",
+            "label": "",
+            "subtitle": "",
+            "link": "",
+            "emoji": "📦",
+            "badge": "",
+            "badge_bg": "#f5a623",
+            "badge_text": "#111111"
+          }
+        },
+        "card_eQRhM8": {
+          "type": "card",
+          "settings": {
+            "collection": "fevicol",
+            "label": "",
+            "subtitle": "",
+            "link": "",
+            "emoji": "📦",
+            "badge": "",
+            "badge_bg": "#f5a623",
+            "badge_text": "#111111"
+          }
+        },
+        "card_tE34Lt": {
+          "type": "card",
+          "settings": {
+            "collection": "wires",
+            "label": "",
+            "subtitle": "",
+            "link": "",
+            "emoji": "📦",
+            "badge": "",
+            "badge_bg": "#f5a623",
+            "badge_text": "#111111"
+          }
+        },
+        "card_pwkVmE": {
+          "type": "card",
+          "settings": {
+            "collection": "sanitary-bath-fittings",
+            "label": "",
+            "subtitle": "",
+            "link": "",
+            "emoji": "📦",
+            "badge": "",
+            "badge_bg": "#f5a623",
+            "badge_text": "#111111"
+          }
+        },
+        "card_AUYRKJ": {
+          "type": "card",
+          "settings": {
+            "collection": "switches-sockets",
+            "label": "",
+            "subtitle": "",
+            "link": "",
+            "emoji": "📦",
+            "badge": "",
+            "badge_bg": "#f5a623",
+            "badge_text": "#111111"
+          }
+        },
+        "card_Bhjder": {
+          "type": "card",
+          "settings": {
+            "collection": "cpvc-pipes-fittings",
+            "label": "",
+            "subtitle": "",
+            "link": "",
+            "emoji": "📦",
+            "badge": "",
+            "badge_bg": "#f5a623",
+            "badge_text": "#111111"
+          }
+        },
+        "card_49wqzQ": {
+          "type": "card",
+          "settings": {
+            "collection": "general-hardware-tools",
+            "label": "",
+            "subtitle": "",
+            "link": "",
+            "emoji": "📦",
+            "badge": "",
+            "badge_bg": "#f5a623",
+            "badge_text": "#111111"
+          }
         }
       },
       "block_order": [
         "card_HhiqDe",
         "card_9RKyCM",
-        "card_L3mVkq"
+        "card_L3mVkq",
+        "card_FkkFDN",
+        "card_eQRhM8",
+        "card_tE34Lt",
+        "card_pwkVmE",
+        "card_AUYRKJ",
+        "card_Bhjder",
+        "card_49wqzQ"
       ],
       "settings": {
         "title": "Shop by Category",
         "title_color": "#111111",
-        "title_size": 18,
+        "title_size": 21,
         "title_weight": "700",
-        "title_gap": 16,
+        "title_gap": 18,
         "view_all_url": "",
         "viewall_text": "View all",
         "viewall_color": "#0f6e56",
         "viewall_size": 13,
-        "card_width": 170,
-        "img_height": 190,
-        "card_gap": 30,
-        "card_radius": 12,
+        "card_width": 160,
+        "img_height": 200,
+        "card_gap": 32,
+        "columns_desktop": 5,
+        "columns_mobile": 2,
+        "card_radius": 10,
         "card_bg": "#ffffff",
         "img_bg": "#f5f5f5",
         "border_width": 1,
@@ -210,10 +310,10 @@
         "img_fit": "cover",
         "img_zoom": 100,
         "overlay_opacity": 0,
-        "label_position": "below",
+        "label_position": "overlay",
         "label_bg": "#ffffff",
         "label_color": "#111111",
-        "label_size": 15,
+        "label_size": 17,
         "label_weight": "500",
         "label_align": "center",
         "label_pad_v": 10,
@@ -221,8 +321,8 @@
         "show_subtitle": false,
         "subtitle_size": 11,
         "subtitle_color": "#888888",
-        "show_count": true,
-        "count_size": 11,
+        "show_count": false,
+        "count_size": 12,
         "count_color": "#888888",
         "badge_size": 11,
         "badge_radius": 6,
