@@ -218,20 +218,11 @@
 
                 {%- comment -%} Overlay label position {%- endcomment -%}
                 {%- if section.settings.label_position == 'overlay' -%}
-                  {%- comment -%} Tall gradient layer so label is always readable {%- endcomment -%}
                   <div style="
                     position: absolute;
                     bottom: 0; left: 0; right: 0;
-                    height: 65%;
-                    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 50%, transparent 100%);
-                    pointer-events: none;
-                    z-index: 1;
-                  "></div>
-                  {%- comment -%} Label text sits above the gradient {%- endcomment -%}
-                  <div style="
-                    position: absolute;
-                    bottom: 0; left: 0; right: 0;
-                    padding: {{ section.settings.label_pad_v | default: 10 }}px {{ section.settings.label_pad_h | default: 12 }}px;
+                    padding: 60px {{ section.settings.label_pad_h | default: 12 }}px {{ section.settings.label_pad_v | default: 10 }}px;
+                    background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.4) 55%, transparent 100%);
                     z-index: 2;
                   ">
                     <p style="margin:0;font-size:{{ section.settings.label_size | default: 13 }}px;font-weight:{{ section.settings.label_weight | default: '600' }};color:#ffffff;line-height:1.3;text-align:{{ section.settings.label_align | default: 'left' }};">{{ the_label }}</p>
