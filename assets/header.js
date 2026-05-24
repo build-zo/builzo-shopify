@@ -144,6 +144,16 @@ function QCUpdateDeliveryOnPage(data) {
 ──────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
 
+  /* Auto-set default pincode on first visit (no saved pincode yet) */
+  if (!window.QCPincode.get()) {
+    var display = document.getElementById('qcPincodeDisplay');
+    var badge   = document.getElementById('qcDeliveryBadge');
+    var dPin  = display ? (display.dataset.defaultPin  || '151001')    : '151001';
+    var dArea = display ? (display.dataset.defaultArea || 'Barnala')   : 'Barnala';
+    var dTime = badge   ? (badge.dataset.defaultTime   || '60-90 min') : '60-90 min';
+    window.QCPincode.set(dPin, dArea, dTime, true);
+  }
+
   /* Apply saved pincode to every element on this page */
   QCUpdateDeliveryOnPage();
 

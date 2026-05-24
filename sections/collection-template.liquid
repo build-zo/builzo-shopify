@@ -388,6 +388,7 @@
 }
 #bzCol-{{ section.id }} .bzc-add-btn {
   flex: 1;
+  min-width: 0;
   height: {{ section.settings.btn_height | default: 40 }}px;
   background: {{ btn_bg }};
   color: {{ btn_text }};
@@ -399,6 +400,9 @@
   font-family: inherit;
   transition: opacity 0.15s;
   letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 #bzCol-{{ section.id }} .bzc-add-btn:hover { opacity: 0.88; }
 #bzCol-{{ section.id }} .bzc-add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -412,6 +416,9 @@
 @media (max-width: 768px) {
   #bzCol-{{ section.id }} .bzc-grid { grid-template-columns: repeat({{ cols_mobile }}, 1fr); gap: {{ section.settings.card_gap_mobile | default: 10 }}px; }
   #bzCol-{{ section.id }} .bzc-img-wrap { height: {{ section.settings.img_height_mobile | default: 150 }}px; }
+  #bzCol-{{ section.id }} .bzc-qty-btn { width: 30px; font-size: 16px; }
+  #bzCol-{{ section.id }} .bzc-qty-val { min-width: 22px; font-size: 13px; }
+  #bzCol-{{ section.id }} .bzc-add-btn { font-size: 12px; letter-spacing: 0; }
 }
 </style>
 

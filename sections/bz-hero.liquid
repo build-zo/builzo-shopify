@@ -158,32 +158,37 @@
 
 <script>
 (function() {
-  var input   = document.getElementById('heroPincodeInput');
-  var btn     = document.getElementById('heroPincodeCheck');
-  var result  = document.getElementById('heroPincodeResult');
+  var input  = document.getElementById('heroPincodeInput');
+  var btn    = document.getElementById('heroPincodeCheck');
+  var result = document.getElementById('heroPincodeResult');
   if (!btn || !input || !result) return;
 
-  btn.addEventListener('click', function() {
+  /* Pre-fill with the currently saved pincode */
+  var saved = window.QCPincode && window.QCPincode.get();
+  if (saved && saved.serviceable !== false) input.value = saved.pincode;
+
+  function check() {
     var pin = input.value.trim();
     if (pin.length !== 6 || !/^\d+$/.test(pin)) {
       result.textContent = '⚠️ Please enter a valid 6-digit pincode';
       result.style.color = '#FCA5A5';
       return;
     }
-    var map = window.QCDeliveryMap || {};
-    if (map[pin]) {
-      result.innerHTML = '✅ Great! We deliver to <strong>' + map[pin].area + '</strong> in <strong>' + map[pin].time + '</strong>';
+    var info = window.QCPincode ? window.QCPincode.lookup(pin) : null;
+    if (info) {
+      window.QCPincode.set(info.pincode, info.area, info.time, true);
+      result.innerHTML = '✅ Delivering to <strong>' + info.area + '</strong> in <strong>' + info.time + '</strong>';
       result.style.color = '#86EFAC';
     } else {
-      result.innerHTML = '❌ Sorry, we don\'t deliver to <strong>' + pin + '</strong> yet.';
+      window.QCPincode.set(pin, pin, null, false);
+      result.innerHTML = '❌ Sorry, <strong>' + pin + '</strong> is not serviceable yet.';
       result.style.color = '#FCA5A5';
     }
-  });
-
-  if (input) {
-    input.addEventListener('input', function() { this.value = this.value.replace(/\D/g,''); });
-    input.addEventListener('keydown', function(e) { if(e.key==='Enter') btn.click(); });
   }
+
+  btn.addEventListener('click', check);
+  input.addEventListener('input', function() { this.value = this.value.replace(/\D/g, ''); });
+  input.addEventListener('keydown', function(e) { if (e.key === 'Enter') check(); });
 })();
 </script>
 
